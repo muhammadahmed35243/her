@@ -406,18 +406,8 @@ $("#dancer").addEventListener("click", e => {
 });
 
 /* ---------- envelope -> letter ---------- */
-const letterBody =
-`${CONFIG.name},
-
-Aaj ke din ke liye kuch bada likhna chahiye tha. Do ghante soch ke bhi koi "perfect" line nahi mili. Toh seedhi baat: tum meri life ke un logon mein ho jinke bina story boring ho jaati hai.
-
-Tumhare hasne se baaki sabka din bhi theek ho jaata hai. Tumhare gusse ke baare mein... chalo, aaj us par baat nahi karte. Aaj ke din sab maaf.
-
-Is saal ke liye bas itna chahiye: engine hamesha smooth, signal hamesha green, fuel kabhi reserve pe na aaye, wo saari cheezein jo tum chupke se maangte ho, aur thoda kam late reply. Thoda.
-
-Happy Birthday, ${CONFIG.name}.`;
-$("#paperFull").textContent = `${letterBody}\n\n${CONFIG.from}`;
-$("#paperSign").textContent = CONFIG.from;
+const letterBody = "";   // blank on purpose: write the letter here
+$("#paperFull").textContent = letterBody;
 let opened = false;
 async function openEnvelope(){
   if (opened) return; opened = true;
