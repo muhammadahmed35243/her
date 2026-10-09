@@ -28,7 +28,7 @@
 
   .scene{
     position:fixed;inset:0;z-index:1;display:none;flex-direction:column;align-items:center;justify-content:center;
-    padding:24px 16px 70px;text-align:center;overflow-y:auto;
+    padding:24px 16px 120px;text-align:center;overflow-y:auto;
   }
   .scene.active{display:flex;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
   @keyframes pop{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
@@ -124,6 +124,35 @@
   #music{position:fixed;top:12px;right:12px;z-index:70;width:44px;height:44px;padding:0;font-size:1.2rem;box-shadow:none;background:var(--card);color:#fff;border:1px solid var(--card-b)}
   #toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-120px);background:#fff;color:#4a1237;padding:10px 18px;border-radius:99px;font-weight:600;font-size:.9rem;z-index:80;transition:transform .4s;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:90vw;text-align:center}
   #toast.show{transform:translate(-50%,0)}
+  /* cat photo frames */
+  .catbox{position:relative;width:min(100%,300px);aspect-ratio:4/3;margin:12px auto;border-radius:20px;overflow:hidden;border:3px solid #fff;box-shadow:0 10px 26px rgba(0,0,0,.4);transform:rotate(-2deg);
+    background:linear-gradient(110deg,rgba(255,255,255,.12) 30%,rgba(255,255,255,.3) 50%,rgba(255,255,255,.12) 70%);background-size:200% 100%;animation:shimmer 1.2s linear infinite}
+  .catbox:nth-of-type(even){transform:rotate(2deg)}
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .catbox.small{width:min(100%,220px)} .catbox.tiny{width:min(100%,160px)}
+  .catbox img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .5s}
+  .catbox.loaded{animation:none;background:#000} .catbox.loaded img{opacity:1}
+  .catbox.fallback{animation:none;background:rgba(255,255,255,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px}
+  .catbox.fallback svg{height:70%;width:auto} .catbox.fallback small{font-weight:600;font-size:.78rem;line-height:1.2}
+  .cat .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+  @keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
+
+  /* mascot */
+  #mascot{position:fixed;left:8px;bottom:26px;z-index:65;display:flex;align-items:flex-end;gap:6px;pointer-events:none}
+  #mascotSvg{width:76px;flex:none;pointer-events:auto;cursor:pointer;animation:bob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+  #mascotSvg.boing{animation:boing .5s}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes boing{0%{transform:scale(1)}30%{transform:scale(1.25,.8)}60%{transform:scale(.9,1.2)}100%{transform:scale(1)}}
+  #bubble{background:#fff;color:#4a1237;border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:.78rem;font-weight:600;line-height:1.35;max-width:min(210px,58vw);margin-bottom:34px;opacity:0;transform:scale(.8);transform-origin:left bottom;transition:.3s;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+  #bubble.show{opacity:1;transform:none}
+  .paw{position:fixed;z-index:40;pointer-events:none;font-size:18px;opacity:.8;animation:paw 1s forwards}
+  @keyframes paw{to{opacity:0;transform:translateY(-26px) rotate(20deg)}}
+
+  /* meme machine */
+  .capRow{display:flex;gap:8px;margin-top:14px}
+  #capIn{flex:1;min-width:0;padding:12px 16px;border-radius:99px;border:1px solid var(--card-b);background:rgba(255,255,255,.15);color:#fff;font:inherit;outline:0}
+  #capIn::placeholder{color:#ffd9ec}
+
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 </head>
@@ -138,7 +167,8 @@
 <section class="scene active" id="gift">
   <div class="wrap">
     <p class="sub">Psst... <span class="nm"></span>, ek chhoti si cheez hai tumhare liye 👀</p>
-    <div class="big" id="giftBox">🎁</div>
+    <div class="catbox small" data-auto data-text="Hey {name}, ye dekho"></div>
+    <div class="big" id="giftBox" style="font-size:6rem">🎁</div>
     <h2>Isko kholo na!</h2>
     <p class="sub">(Sirf <b>tum</b> khol sakti ho. Baaki sab ke liye ye bomb hai 💣)</p>
     <div class="row"><button id="openGift">Tap to open 🎀</button></div>
@@ -149,6 +179,7 @@
 <section class="scene" id="loader">
   <div class="wrap">
     <h2>Birthday Wish Loading...</h2>
+    <div class="catbox small" data-auto data-gif="1"></div>
     <div class="bar"><i id="barFill"></i></div>
     <p id="loadPct" style="font-weight:700;font-size:1.4rem">0%</p>
     <p id="loadMsg"></p>
@@ -163,6 +194,7 @@
     <h2 id="qText" style="font-size:1.5rem;margin-top:.5em"></h2>
     <div class="opts" id="qOpts"></div>
     <div class="react" id="qReact"></div>
+    <div class="catbox small" id="qCat" style="display:none"></div>
     <div class="row"><button id="qNext" style="display:none">Agla sawaal ➜</button></div>
   </div>
 </section>
@@ -170,7 +202,7 @@
 <!-- 3: runaway -->
 <section class="scene" id="hug">
   <div class="wrap">
-    <div class="big">🥺</div>
+    <div class="catbox small" id="hugCat" data-auto data-text="Ek hug dedo na"></div>
     <h2>Ek serious sawaal...</h2>
     <p>Kya main tumhe aaj <b>ek bada wala hug</b> de sakta hu?</p>
     <div class="arena" id="arena">
@@ -194,6 +226,7 @@
       <div class="plate"></div>
     </div>
     <p id="cakeMsg" class="react">Abhi 0 / 5 candles bujhi hain</p>
+    <div class="catbox tiny" data-auto data-text="Make a wish"></div>
     <div class="row">
       <button id="blowBtn" class="ghost">🎤 Phook maaro</button>
       <button id="cakeNext" style="display:none">Wish ho gayi ✨</button>
@@ -222,7 +255,19 @@
   </div>
 </section>
 
-<!-- 7: letter -->
+<!-- 7: cat meme machine -->
+<section class="scene" id="cats">
+  <div class="wrap">
+    <h2>Cat Meme Machine 😹</h2>
+    <p class="sub">Har tap pe naya cat, naya caption. Apna caption bhi likh sakti ho!</p>
+    <div class="catbox" id="memeBox"></div>
+    <div class="row" style="margin-top:6px"><button id="newCat">🐱 Naya cat</button></div>
+    <div class="capRow"><input id="capIn" maxlength="40" placeholder="Apna caption likho..."><button id="capBtn" class="pink">Bhejo</button></div>
+    <div class="row"><button id="catsNext" class="ghost">Chitthi padho ➜</button></div>
+  </div>
+</section>
+
+<!-- 8: letter -->
 <section class="scene" id="letterScene">
   <div class="wrap">
     <h2>Tumhare naam ek chitthi 💌</h2>
@@ -234,7 +279,7 @@
 <!-- 8: finale -->
 <section class="scene" id="finale">
   <div class="wrap">
-    <div class="big">🥳</div>
+    <div class="catbox" data-auto data-gif="1" data-text="Happy Birthday {name}"></div>
     <h1>Happy Birthday<br><span class="nm"></span>!</h1>
     <p>Tum sabse best ho, bas mujhse thodi kam 😎<br><span class="sub">(mazaak! tum hi best ho ❤️)</span></p>
     <p class="sub" style="margin-top:18px">Kahin bhi tap karo, aatishbazi hogi 🎆</p>
@@ -242,6 +287,7 @@
   </div>
 </section>
 
+<div id="mascot"><div id="mascotSvg" title="Mujhe chhuo 😼"></div><div id="bubble"></div></div>
 <div id="dots"></div>
 
 <script>
@@ -261,7 +307,19 @@ document.title = `Happy Birthday ${CONFIG.name}! 🎂`;
 const $ = s => document.querySelector(s);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => Math.random() * (b - a) + a;
-const scenes = ["gift","loader","quiz","hug","cakeScene","reasons","coupons","letterScene","finale"];
+const scenes = ["gift","loader","quiz","hug","cakeScene","reasons","coupons","cats","letterScene","finale"];
+const sceneLines = {
+  gift: "Meow! Main is party ki security hu 😼",
+  loader: "Server mere neeche so gaya hai, sorry 😴",
+  quiz: "Sab sahi hai, bas mujhe treat do 🐟",
+  hug: "Haan bol do, mujhe bhi hug chahiye 🥺",
+  cakeScene: "Candle bujhao, cake ka pehla tukda mera!",
+  reasons: "Palto palto, sab reasons sachche hain 😻",
+  coupons: "Meri taraf se bhi 1 coupon: free purrr 😽",
+  cats: "Yahan main famous hu. Caption likho!",
+  letterScene: "Aww... koi pyaaz kaat raha hai yahan 🥹",
+  finale: "HAPPY BIRTHDAY!! Meow meow meow 🎉"
+};
 let cur = 0;
 const dots = $("#dots");
 scenes.forEach(() => dots.appendChild(document.createElement("i")));
@@ -271,6 +329,9 @@ function go(i){
   $("#" + scenes[i]).classList.add("active");
   [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
   $("#" + scenes[i]).scrollTop = 0;
+  loadSceneCats();
+  setTimeout(() => { if (cur === i) mascotSay(sceneLines[scenes[i]]); }, 700);
+  if (scenes[i] === "cats") newMeme();
   if (scenes[i] === "loader") runLoader();
   if (scenes[i] === "quiz") showQ();
   if (scenes[i] === "letterScene") typeLetter();
@@ -283,7 +344,7 @@ function toast(msg){
 }
 
 /* ============ floating hearts / balloons ============ */
-const floatEmojis = ["❤️","💖","🎈","✨","🎉","💕","🌸","🎂"];
+const floatEmojis = ["❤️","💖","🎈","✨","🎉","💕","🌸","🎂","🐱","😻","🐾"];
 setInterval(() => {
   if (document.hidden) return;
   const f = document.createElement("div");
@@ -369,6 +430,111 @@ function setMusic(on){
 }
 $("#music").onclick = () => setMusic(!musicOn);
 
+/* ============ cats 🐱 (live photos + animated mascot fallback) ============ */
+const CAT_BASE = "https://cataas.com/cat";
+function catURL({gif = false, text = "", w = 480} = {}){
+  let u = CAT_BASE + (gif ? "/gif" : "");
+  if (text) u += "/says/" + encodeURIComponent(text);
+  return `${u}?width=${w}&fontSize=34&fontColor=white&t=${Date.now()}${Math.floor(Math.random() * 1e4)}`;
+}
+const fillText = t => (t || "").replace("{name}", CONFIG.name).replace("{from}", CONFIG.from);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function catSVG(){
+  return `<svg class="cat" viewBox="0 -26 120 136" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <polygon points="16,44 20,10 54,28" fill="#ff9d4d"/><polygon points="104,44 100,10 66,28" fill="#ff9d4d"/>
+  <polygon points="24,38 26,19 43,29" fill="#ffb3c7"/><polygon points="96,38 94,19 77,29" fill="#ffb3c7"/>
+  <ellipse cx="60" cy="68" rx="46" ry="40" fill="#ffa95c"/>
+  <path d="M60 30v10M50 32l3 8M70 32l-3 8" stroke="#d9772a" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="28" cy="78" rx="8" ry="5" fill="#ff7aa8" opacity=".45"/><ellipse cx="92" cy="78" rx="8" ry="5" fill="#ff7aa8" opacity=".45"/>
+  <g class="eyes"><circle cx="41" cy="62" r="11" fill="#fff"/><circle cx="79" cy="62" r="11" fill="#fff"/>
+  <circle class="pupil" cx="41" cy="62" r="6" fill="#222"/><circle class="pupil" cx="79" cy="62" r="6" fill="#222"/></g>
+  <path d="M55 77h10l-5 6z" fill="#ff5c8a"/>
+  <path d="M60 83q-6 8-13 3M60 83q6 8 13 3" stroke="#5a2a14" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M10 74l20 4M10 86l20-3M110 74l-20 4M110 86l-20-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="42,32 60,-18 78,32" fill="#ff4d8d"/><path d="M47 22h26M52 8h16" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="-18" r="6" fill="#ffd166"/>
+  </svg>`;
+}
+function fillCat(box, opts){
+  const tok = box._tok = (box._tok || 0) + 1;
+  clearTimeout(box._t);
+  box.classList.remove("loaded", "fallback");
+  box.innerHTML = "";
+  const fail = () => {
+    if (box._tok !== tok) return;
+    box.classList.add("fallback");
+    box.innerHTML = `${catSVG()}<small></small>`;
+    box.querySelector("small").textContent = opts.text || "Meow!";
+  };
+  const img = new Image();
+  img.alt = "cute cat"; img.decoding = "async";
+  img.onload = () => { if (box._tok !== tok) return; clearTimeout(box._t); box.classList.add("loaded"); };
+  img.onerror = fail;
+  box.appendChild(img);
+  box._t = setTimeout(fail, 14000);
+  img.src = catURL(opts);
+}
+function loadSceneCats(){
+  document.querySelectorAll("#" + scenes[cur] + " .catbox[data-auto]").forEach(b =>
+    fillCat(b, {gif: b.dataset.gif === "1", text: fillText(b.dataset.text)}));
+}
+/* meme machine */
+const memeCaps = ["Happy Birthday {name}!", "Treat kab de rahi ho?", "Mujhe bhi cake do", "Aaj sab maaf hai", "Birthday girl on duty", "{from} ne bola tum cute ho", "Main bhi party mein aaunga", "Aaj mera bhi birthday hai (jhooth)"];
+let memeCount = 0;
+function newMeme(text){
+  fillCat($("#memeBox"), {text: fillText(text || pick(memeCaps))});
+  if (++memeCount === 4) mascotSay("Bas bas, ab chitthi bhi padh lo 😼");
+}
+$("#newCat").onclick = () => newMeme();
+const sendCap = () => { const v = $("#capIn").value.trim(); if (v) { newMeme(v); $("#capIn").value = ""; confetti(40, innerWidth/2, innerHeight/2); } };
+$("#capBtn").onclick = sendCap;
+$("#capIn").addEventListener("keydown", e => { if (e.key === "Enter") sendCap(); });
+$("#catsNext").onclick = () => go(8);
+
+/* mascot */
+$("#mascotSvg").innerHTML = catSVG();
+let bubbleT;
+function mascotSay(t, ms = 4500){
+  const b = $("#bubble"); b.textContent = t; b.classList.add("show");
+  clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove("show"), ms);
+}
+function meow(){
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), t = ac.currentTime;
+    o.type = "sawtooth"; f.type = "lowpass"; f.frequency.value = 1400;
+    o.frequency.setValueAtTime(520, t); o.frequency.linearRampToValueAtTime(900, t + .12); o.frequency.linearRampToValueAtTime(420, t + .4);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12, t + .05); g.gain.exponentialRampToValueAtTime(.001, t + .45);
+    o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t + .5);
+  } catch (e) {}
+}
+const quips = ["Meow 😺", "Mujhe treat do 🐟", "Main birthday cat hu, bohot important", "Purrr... tum cute ho 😽", "Mere liye bhi cake bachana 🎂", "*tail wag*", "Mujhe kyun chhua? Hmph 😾"];
+$("#mascotSvg").onclick = () => {
+  const m = $("#mascotSvg"); m.classList.remove("boing"); void m.offsetWidth; m.classList.add("boing");
+  meow(); mascotSay(pick(quips));
+  const r = m.getBoundingClientRect(); confetti(30, r.left + r.width/2, r.top);
+};
+setInterval(() => { if (!document.hidden && scenes[cur] !== "letterScene") mascotSay(pick(quips), 3500); }, 28000);
+/* eyes follow pointer + paw trail */
+let eyeRAF = 0, lastPaw = 0;
+addEventListener("pointermove", e => {
+  if (!eyeRAF) eyeRAF = requestAnimationFrame(() => {
+    eyeRAF = 0;
+    document.querySelectorAll("svg.cat").forEach(svg => {
+      const r = svg.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height*.55);
+      const d = Math.hypot(dx, dy) || 1, m = Math.min(4, d / 40);
+      svg.querySelectorAll(".pupil").forEach(p => p.setAttribute("transform", `translate(${dx/d*m} ${dy/d*m})`));
+    });
+  });
+  const now = performance.now();
+  if (now - lastPaw > 110) {
+    lastPaw = now;
+    const p = document.createElement("div"); p.className = "paw"; p.textContent = "🐾";
+    p.style.left = e.clientX - 9 + "px"; p.style.top = e.clientY - 9 + "px";
+    document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
+  }
+});
+
 /* ============ 0: gift ============ */
 async function openGift(){
   if ($("#gift").classList.contains("opening")) return;
@@ -435,6 +601,7 @@ function showQ(){
   $("#qText").textContent = d.q;
   $("#qReact").textContent = "";
   $("#qNext").style.display = "none";
+  $("#qCat").style.display = "none";
   $("#qNext").textContent = qi === quiz.length - 1 ? "Aage badho ➜" : "Agla sawaal ➜";
   const box = $("#qOpts"); box.innerHTML = "";
   d.o.forEach(([label, reply]) => {
@@ -444,6 +611,8 @@ function showQ(){
       [...box.children].forEach(x => x.disabled = true);
       b.style.background = "linear-gradient(135deg,#ff7aa8,#b44bff)";
       $("#qReact").textContent = reply;
+      $("#qCat").style.display = "block";
+      fillCat($("#qCat"), {text: pick(["Sahi jawab", "Genius ho tum", "Wah wah", "Bilkul sahi"])});
       confetti(40, b.getBoundingClientRect().left + 40, b.getBoundingClientRect().top);
       $("#qNext").style.display = "inline-block";
     };
@@ -465,6 +634,7 @@ function dodge(e){
   const s = Math.min(1 + dodges * .16, 1.9);
   yes.style.transform = `translateX(-50%) scale(${s})`;
   if (dodges === 3) toast("Bhaag raha hai 'Nahi' button 😂");
+  if (dodges === 4) fillCat($("#hugCat"), {text: "Haan bol do na"});
   if (dodges === 6) $("#hugHint").textContent = "Haar maan lo, 'Haan' bada hota ja raha hai 😏";
 }
 ["pointerenter","pointerdown","click","touchstart"].forEach(ev => $("#no").addEventListener(ev, dodge, {passive:false}));
@@ -549,7 +719,7 @@ coupons.forEach(([e, t, s]) => {
   c.onclick = () => { c.classList.add("used"); confetti(50, c.getBoundingClientRect().left + 40, c.getBoundingClientRect().top); toast("Redeemed! No refunds 😎"); };
   $("#couponList").appendChild(c);
 });
-$("#couponNext").onclick = () => go(7);
+$("#couponNext").onclick = () => go(7);   // cats
 
 /* ============ 7: letter ============ */
 const letterText =
@@ -582,7 +752,7 @@ async function typeLetter(){
   typing = false;
 }
 $("#skipType").onclick = () => { typeAbort = true; };
-$("#surprise").onclick = () => { confetti(200); go(8); };
+$("#surprise").onclick = () => { confetti(200); go(9); };
 
 /* ============ 8: finale ============ */
 $("#replay").onclick = () => { blown = 0; flipped = 0; location.href = location.pathname + location.search; };
