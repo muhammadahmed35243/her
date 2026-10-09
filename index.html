@@ -467,9 +467,11 @@ const burstFireworks = n => { for (let i = 0; i < n; i++) setTimeout(() => firew
   ctx.clearRect(0, 0, innerWidth, innerHeight);
   parts = parts.filter(p => p.life > 0);
   for (const p of parts){
+    if (p.type === "p"){ p.vx += Math.sin(p.life / 11) * .03; p.vy *= .985; }
     p.x += p.vx; p.y += p.vy; p.vy += p.g; p.vx *= p.type==="f" ? .985 : .99; p.r += p.vr; p.life--;
     ctx.globalAlpha = Math.min(1, p.life/30); ctx.fillStyle = p.c;
-    if (p.type === "c"){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); }
+    if (p.type === "p"){ ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.beginPath(); ctx.ellipse(0, 0, p.w, p.h, 0, 0, 7); ctx.fill(); ctx.restore(); }
+    else if (p.type === "c"){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); }
     else { ctx.beginPath(); ctx.arc(p.x,p.y,p.w/2,0,7); ctx.fill(); }
   }
   ctx.globalAlpha = 1; requestAnimationFrame(loop);
@@ -568,10 +570,17 @@ function makeSprite(col, style){
       c.beginPath(); c.arc(Math.cos(a) * r, Math.sin(a) * r, 2.3, 0, TAU); c.fillStyle = k % 3 ? "#f6ecd0" : shade(col, .3); c.fill(); }
     c.beginPath(); c.arc(0, 0, 8, 0, TAU); c.fillStyle = "#8fb06a"; c.fill();
   }
-  return cv;
+  cv.col = col; return cv;
 }
 const sprites = GCOL.flatMap((col, i) => [makeSprite(col, GSTYLE[i]), makeSprite(col, GSTYLE[i])]);
-let field = [], bloomT0 = 0, bloomState = "idle";   // idle | blooming | done
+/* falling petals (shared fx canvas) */
+function petals(n, x, y, cols, power = 1, rain = false){
+  for (let i = 0; i < n; i++)
+    parts.push({x: x ?? rnd(0, innerWidth), y: y ?? -10, vx: rnd(-2, 2) * power, vy: rain ? rnd(.6, 1.6) : rnd(-5, -1) * power, g: .05,
+      life: rnd(170, 270), c: pick(cols), w: rnd(5, 9), h: rnd(3, 5), r: rnd(0, 6), vr: rnd(-.08, .08), type: "p"});
+}
+const PETAL_COLS = ["#f7b0c4", "#ffd6e2", "#f6d86a", "#e5483b", "#ffffff"];
+let field = [], bloomT0 = 0, closeT0 = 0, bloomState = "idle";   // idle | blooming | done | closing
 function sizeGarden(){
   const r = devicePixelRatio || 1; gcv.width = innerWidth * r; gcv.height = innerHeight * r; gctx.setTransform(r, 0, 0, r, 0, 0);
 }
@@ -591,15 +600,24 @@ const easeOutBack = p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math
 function gardenFrame(now){
   if (order[cur] !== "garden") return;
   gctx.clearRect(0, 0, innerWidth, innerHeight);
-  if (bloomState !== "idle"){
+  if (bloomState === "closing"){
+    const tc = now - closeT0;                       // flowers fold away, far corner first
+    for (const f of field){
+      const q = Math.max(0, Math.min(1, (tc - (3700 - f.delay) * .32) / 650));
+      if (q >= 1) continue;
+      const s = f.size * (1 - q * q * q);
+      gctx.save(); gctx.translate(f.x, f.y); gctx.rotate(f.rot + q * 1.4); gctx.drawImage(f.sp, -s / 2, -s / 2, s, s); gctx.restore();
+    }
+  } else if (bloomState !== "idle"){
     const t = now - bloomT0, calm = bloomState === "done"; let allDone = true;
     for (const f of field){
       const p = Math.max(0, Math.min(1, (t - f.delay) / 950));
       if (p < 1) allDone = false;
       if (p <= 0) continue;
-      const s = f.size * Math.max(0, easeOutBack(p)) * (calm ? 1 + Math.sin(now / 2100 + f.ph) * .012 : 1);
+      const k = f.pop ? Math.max(0, 1 - (now - f.pop) / 550) : 0;           // tap "pop"
+      const s = f.size * Math.max(0, easeOutBack(p)) * (calm ? 1 + Math.sin(now / 2100 + f.ph) * .012 : 1) * (1 + .22 * Math.sin(k * Math.PI));
       gctx.save(); gctx.translate(f.x, f.y);
-      gctx.rotate(f.rot - (1 - p) * 1.2 + (calm ? Math.sin(now / 1700 + f.ph) * .04 : 0));
+      gctx.rotate(f.rot - (1 - p) * 1.2 + (calm ? Math.sin(now / 1700 + f.ph) * .04 : 0) + k * .5);
       gctx.globalAlpha = Math.min(1, p * 2.2); gctx.drawImage(f.sp, -s / 2, -s / 2, s, s); gctx.restore();
     }
     if (bloomState === "blooming" && allDone){ bloomState = "done"; $("#gardenCard").classList.add("show"); chord([392, 523.25, 659.25], .06); }
@@ -628,8 +646,24 @@ function touchBlossom(){
 }
 $("#blossom").addEventListener("pointerdown", e => { e.preventDefault(); touchBlossom(); });
 $("#blossom").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") touchBlossom(); });
+/* tap a flower: it pops and throws petals */
+$("#garden").addEventListener("pointerdown", e => {
+  if (bloomState !== "done" || e.target.closest("#gardenCard")) return;
+  for (let i = field.length - 1; i >= 0; i--){            // topmost flower first
+    const f = field[i];
+    if (Math.hypot(e.clientX - f.x, e.clientY - f.y) < f.size * .38){
+      f.pop = performance.now(); petals(14, e.clientX, e.clientY, [f.sp.col, shade(f.sp.col, .35), "#ffffff"], 1.3);
+      blip(pick([659.25, 783.99, 880, 1046.5]), .5, .05); break;
+    }
+  }
+});
+setInterval(() => { if (bloomState === "done" && order[cur] === "garden" && !document.hidden) petals(1, null, -10, GCOL, 1, true); }, 650);
 $("#gardenNext").onclick = async () => {
-  const sc = $("#garden"), a = sc.animate([{opacity: 1}, {opacity: 0}], {duration: 800, fill: "forwards"});
+  if (bloomState !== "done") return;
+  bloomState = "closing"; closeT0 = performance.now(); $("#gardenCard").classList.remove("show");
+  chord([329.63, 392, 493.88], .05);
+  await sleep(1700);
+  const sc = $("#garden"), a = sc.animate([{opacity: 1}, {opacity: 0}], {duration: 700, fill: "forwards"});
   await a.finished; go("lock"); a.cancel();
 };
 
@@ -904,7 +938,11 @@ $("#surprise").onclick = () => { confetti(160); next(); };
 /* ============ 9: finale ============ */
 const credits = [["STARRING", ""], [CONFIG.name, "b"], ["", ""], ["CAST", ""], ["Cake: as itself (eaten)", ""], ["Treat: pending", ""], ["Long drive: pending", ""], ["Dream car: in progress", ""], ["", ""], ["SPECIAL THANKS", ""], ["Tumhari patience", ""], ["Meri bakwaas", ""], ["", ""], ["NO EGOS WERE HARMED*", "b"], ["*wo pehle se hi bade the", ""]];
 $("#credits").innerHTML = credits.map(([t, c]) => t === t.toUpperCase() && t && c !== "b" ? `<u>${t}</u>` : c === "b" ? `<b>${t}</b>` : t).map(x => `<div>${x || "&nbsp;"}</div>`).join("");
-function runFinale(){ chord([261.63, 329.63, 392, 523.25], .09); burstFireworks(7); setTimeout(() => burstFireworks(4), 3500); }
+function runFinale(){
+  chord([261.63, 329.63, 392, 523.25], .09); burstFireworks(7); setTimeout(() => burstFireworks(4), 3500);
+  // petals rain, bookending the garden intro
+  const iv = setInterval(() => { if (order[cur] !== "finale") return clearInterval(iv); if (!document.hidden) petals(2, null, -10, PETAL_COLS, 1, true); }, 380);
+}
 $("#replay").onclick = () => location.reload();
 
 go(0);
