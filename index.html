@@ -9,42 +9,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400;1,500&family=Space+Grotesk:wght@500;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#07080d; --ink:#eceff7; --muted:#8d94a9; --line:rgba(255,255,255,.1);
-    --glass:rgba(255,255,255,.045); --gold:#e8c16a; --gold2:#b8893a; --ice:#7dd3fc; --bad:#ff6b6b; --ok:#5ee6a8;
-  }
+  :root{--bg:#07080d}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;height:100%}
-  body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;--mx:50%;--my:30%}
-  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:radial-gradient(520px circle at var(--mx) var(--my),rgba(232,193,106,.10),transparent 60%),
-               radial-gradient(900px circle at 85% 110%,rgba(125,211,252,.07),transparent 60%)}
-  canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-  #bg{z-index:0} #fx{z-index:50}
-  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold2),var(--gold));z-index:90;transition:width .6s}
-
-  .scene{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px 18px 40px;text-align:center;overflow-y:auto}
-  .scene.active{display:flex;animation:enter .7s cubic-bezier(.2,.8,.2,1)}
-  @keyframes enter{from{opacity:0;transform:translateY(18px) scale(.98);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
-  .wrap{width:100%;max-width:440px;margin:auto}
-  h1,h2{font-family:'Space Grotesk',Inter,sans-serif;font-weight:700;margin:.2em 0 .35em;letter-spacing:-.01em}
-  h2{font-size:clamp(1.5rem,6vw,2rem)}
-  p{line-height:1.6;margin:.5em 0}
-  .sub{color:var(--muted);font-size:.92rem}
-  .eyebrow{font:600 .72rem 'JetBrains Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
-  .gold{color:var(--gold)}
-  .panel{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-
-  button{font:600 .98rem Inter,sans-serif;color:#1a1204;background:linear-gradient(180deg,#f3d58f,var(--gold));border:0;border-radius:12px;padding:14px 26px;cursor:pointer;box-shadow:0 0 0 1px rgba(255,255,255,.25) inset,0 10px 30px rgba(232,193,106,.22);transition:transform .15s,box-shadow .15s,opacity .2s}
-  button:hover{box-shadow:0 0 0 1px rgba(255,255,255,.3) inset,0 12px 34px rgba(232,193,106,.34)}
-  button:active{transform:scale(.97)}
-  button:disabled{opacity:.4;cursor:not-allowed}
-  button.ghost{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset}
-  button.ghost:hover{box-shadow:0 0 0 1px var(--gold) inset}
-  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
-
-  /* -1 garden intro */
-  #garden{padding:0;overflow:hidden;background:linear-gradient(180deg,#d8c2c4 0%,#ffe3e8 16%,#ffdde6 52%,#ffc6d5 82%,#b88b97 100%)}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);overflow:hidden}
+  #garden{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(180deg,#d8c2c4 0%,#ffe3e8 16%,#ffdde6 52%,#ffc6d5 82%,#b88b97 100%)}
   #garden canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
   #gardenHint{position:relative;z-index:2;font:400 clamp(2.3rem,10vw,3.6rem) 'Great Vibes',cursive;color:#5b3a4a;text-shadow:0 2px 16px rgba(255,255,255,.8);animation:hintPulse 2.6s ease-in-out infinite;transition:opacity .9s,transform .9s;pointer-events:none}
   @keyframes hintPulse{50%{opacity:.55;transform:scale(1.03)}}
@@ -54,153 +23,10 @@
   #blossom svg{width:100%;height:100%;display:block}
   @keyframes bsway{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(5px)}}
   @keyframes ripple{from{transform:scale(.8);opacity:.9}to{transform:scale(1.5);opacity:0}}
-  #gardenCard{position:absolute;z-index:4;left:50%;top:30%;transform:translate(-50%,-46%) scale(.94);width:min(86vw,380px);padding:26px 22px 22px;border-radius:26px;background:rgba(255,246,248,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);box-shadow:0 24px 70px rgba(120,40,70,.38);color:#4a2a3a;opacity:0;pointer-events:none;transition:opacity 1.1s,transform 1.1s}
-  #gardenCard.show{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
-  @media (min-width:700px){#gardenCard{left:62%;top:42%}}
-  #gardenCard .for{font:600 .72rem 'JetBrains Mono',monospace;letter-spacing:.24em;color:#a45670;text-transform:uppercase}
-  #gardenCard .hb{font:400 clamp(2.8rem,13vw,3.5rem)/1.05 'Great Vibes',cursive;margin:8px 0 2px;color:#7a2d4c}
-  #gardenCard p{color:#7a5666;margin:.2em 0}
-  button.rose{background:linear-gradient(180deg,#ff8fb0,#e0527f);color:#fff;box-shadow:0 10px 26px rgba(224,82,127,.42)}
-  button.rose:hover{box-shadow:0 12px 32px rgba(224,82,127,.58)}
-  body.in-garden #music{display:none}
-
-  /* 0 lock */
-  #lock .clock{font:700 4.2rem 'Space Grotesk',sans-serif;letter-spacing:-.03em;line-height:1}
-  #lock .date{color:var(--muted);margin-top:4px;font-size:.9rem}
-  .badge{display:inline-flex;align-items:center;gap:8px;margin:26px 0 8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:.85rem}
-  .badge i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pulse 1.4s infinite}
-  @keyframes pulse{50%{opacity:.3}}
-  .holdzone{position:relative;width:140px;height:140px;margin:26px auto 10px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
-  .holdzone svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
-  .holdzone circle{fill:none;stroke-width:4}
-  .holdzone .track{stroke:var(--line)} .holdzone .prog{stroke:var(--gold);stroke-linecap:round;filter:drop-shadow(0 0 8px rgba(232,193,106,.7))}
-  .holdzone .core{position:absolute;inset:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.4rem;background:radial-gradient(circle,rgba(232,193,106,.18),transparent 70%);border:1px solid var(--line)}
-  .holdzone .core span{font:700 .8rem/1.25 'Space Grotesk',sans-serif;letter-spacing:.18em;color:var(--gold)}
-  .holdzone.on .core{animation:throb .5s infinite alternate}
-
-  /* rev gauge */
-  .gauge{position:relative;width:min(100%,340px);margin:6px auto 0}
-  .gauge svg{width:100%;display:block}
-  .gauge .rpm{position:absolute;left:0;right:0;bottom:6px;font:700 1.5rem 'Space Grotesk',sans-serif;letter-spacing:.04em}
-  .gauge .rpm small{display:block;font:600 .62rem 'JetBrains Mono',monospace;letter-spacing:.3em;color:var(--muted)}
-  .gauge.hot{animation:vib .08s infinite}
-  @keyframes vib{25%{transform:translate(1px,-1px)}75%{transform:translate(-1px,1px)}}
-  #needle{transition:none}
-  #gas{margin-top:14px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding:20px 34px;font-size:1.05rem;letter-spacing:.06em}
-  @keyframes throb{to{transform:scale(1.08)}}
-  #lock.flash{animation:flash .6s}
-  @keyframes flash{30%{background:rgba(232,193,106,.25)}}
-  #holdHint{min-height:1.6em;color:var(--gold);font-size:.9rem}
-
-  /* 1 boot */
-  .term{text-align:left;font:400 .84rem/1.75 'JetBrains Mono',monospace;min-height:280px;background:rgba(0,0,0,.45)}
-  .term .ok{color:var(--ok)} .term .warn{color:var(--gold)} .term .bad{color:var(--bad)} .term .dim{color:var(--muted)}
-  .term .cur::after{content:'█';animation:blink .8s steps(1) infinite;color:var(--gold)}
-  @keyframes blink{50%{opacity:0}}
-
-  /* 2 card */
-  .stage{perspective:900px}
-  .pcard{position:relative;text-align:left;border-radius:22px;padding:22px 20px 18px;transform-style:preserve-3d;transition:transform .12s ease-out;
-    background:linear-gradient(155deg,#2a2112 0%,#13110c 45%,#241b0c 100%);border:1px solid rgba(232,193,106,.5);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 30px 60px rgba(0,0,0,.6),0 0 60px rgba(232,193,106,.12);overflow:hidden}
-  .pcard::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.12) 45%,transparent 60%);transform:translateX(var(--sx,-100%));transition:transform .4s;pointer-events:none}
-  .pc-top{display:flex;align-items:flex-end;gap:12px}
-  .ovr{font:700 3.6rem/0.9 'Space Grotesk',sans-serif;color:var(--gold)}
-  .pos{font:600 .75rem 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--muted);padding-bottom:6px}
-  .pc-name{font:700 1.7rem 'Space Grotesk',sans-serif;margin-top:10px;text-transform:uppercase;letter-spacing:.04em}
-  .pc-sub{font:400 .68rem 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--gold);margin:2px 0 14px}
-  .stat{margin:9px 0}
-  .stat .l{display:flex;justify-content:space-between;font:600 .74rem 'JetBrains Mono',monospace;letter-spacing:.08em}
-  .stat .b{height:5px;border-radius:9px;background:rgba(255,255,255,.1);margin:5px 0 3px;overflow:hidden}
-  .stat .b i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
-  .stat small{color:var(--muted);font-size:.7rem;font-style:italic}
-
-  /* 3 quiz */
-  .qtag{font:600 .72rem 'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--gold)}
-  .opts{display:grid;gap:10px;margin-top:16px}
-  .opt{background:var(--glass);color:var(--ink);box-shadow:0 0 0 1px var(--line) inset;text-align:left;font-weight:500;padding:14px 16px}
-  .opt:hover{box-shadow:0 0 0 1px var(--gold) inset}
-  .opt.picked{background:rgba(232,193,106,.14);box-shadow:0 0 0 1px var(--gold) inset}
-  .react{min-height:3.4em;margin-top:16px;color:var(--gold);font-weight:500;font-size:.95rem}
-
-  /* 4 ask */
-  .arena{position:relative;height:200px;width:100%;margin-top:14px}
-  #yes{position:absolute;left:50%;top:26px;transform:translateX(-50%) scale(1);transition:transform .25s}
-  #no{position:absolute;left:58%;top:128px;transition:left .22s,top .22s;white-space:nowrap}
-
-  /* 5 cake */
-  .cake{position:relative;width:240px;height:200px;margin:46px auto 16px}
-  .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:12px 12px 8px 8px;box-shadow:inset 0 -8px 0 rgba(0,0,0,.25)}
-  .t1{bottom:0;width:240px;height:68px;background:#3a2a20} .t2{bottom:68px;width:176px;height:58px;background:#c7a36a} .t3{bottom:126px;width:116px;height:46px;background:#3a2a20}
-  .tier::after{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:var(--gold);border-radius:12px 12px 0 0;opacity:.9}
-  .plate{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:270px;height:12px;border-radius:50%;background:rgba(255,255,255,.18)}
-  .candles{position:absolute;bottom:170px;left:50%;transform:translateX(-50%);display:flex;gap:12px}
-  .candle{position:relative;width:8px;height:42px;background:linear-gradient(180deg,#f7ecd0,#c9b27c);border-radius:2px;cursor:pointer}
-  .candle::before{content:"";position:absolute;inset:-14px -12px 0}
-  .flame{position:absolute;left:50%;top:-24px;width:12px;height:22px;margin-left:-6px;background:radial-gradient(circle at 50% 72%,#fff 0 18%,#ffd980 42%,#ff8a1f 85%);border-radius:50% 50% 50% 50%/65% 65% 35% 35%;animation:flick .18s infinite alternate;filter:drop-shadow(0 0 12px rgba(255,170,60,.9))}
-  @keyframes flick{from{transform:scale(1) rotate(-4deg)}to{transform:scale(.88,1.1) rotate(4deg)}}
-  .candle.out .flame{display:none}
-  .candle.out::after{content:"";position:absolute;left:50%;top:-10px;width:6px;height:26px;margin-left:-3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.35));border-radius:6px;animation:smoke 1.4s forwards}
-  @keyframes smoke{to{transform:translateY(-34px) scaleX(2.2);opacity:0}}
-
-  /* 6 episodes */
-  .eps{display:grid;gap:10px;margin-top:14px;text-align:left}
-  .ep{background:var(--glass);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .2s}
-  .ep.open{border-color:var(--gold)}
-  .ep .h{display:flex;align-items:center;gap:12px;padding:13px 14px}
-  .ep .code{font:600 .7rem 'JetBrains Mono',monospace;color:var(--gold);letter-spacing:.1em;white-space:nowrap}
-  .ep .t{font-weight:600;flex:1}
-  .ep .pl{color:var(--muted);transition:transform .3s}
-  .ep.open .pl{transform:rotate(90deg);color:var(--gold)}
-  .ep .d{max-height:0;overflow:hidden;transition:max-height .45s ease;color:var(--muted);font-size:.9rem;line-height:1.55;padding:0 14px}
-  .ep.open .d{max-height:140px;padding-bottom:14px}
-
-  /* gallery */
-  .polaroid{background:#f4f1ea;color:#222;padding:12px 12px 16px;border-radius:6px;box-shadow:0 20px 40px rgba(0,0,0,.55);transform:rotate(-2deg);transition:transform .4s;max-width:300px;margin:12px auto}
-  .polaroid img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#ccc}
-  .polaroid p{font:italic 500 1rem 'Playfair Display',serif;margin:12px 0 0}
-
-  /* 7 patch */
-  .patch{text-align:left;font:400 .83rem/1.7 'JetBrains Mono',monospace;background:rgba(0,0,0,.45);min-height:300px}
-  .patch .v{font:700 1.05rem 'Space Grotesk',sans-serif;color:var(--gold);margin-bottom:8px}
-  .patch .ln{opacity:0;transform:translateX(-8px);transition:.4s;margin:7px 0}
-  .patch .ln.show{opacity:1;transform:none}
-  .patch .add{color:var(--ok)} .patch .imp{color:var(--ice)} .patch .rem{color:var(--bad)} .patch .iss{color:var(--gold)}
-  .pbar{height:8px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin:18px 0 6px;display:none}
-  .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .25s linear}
-
-  /* 8 letter */
-  .letter{text-align:left;font:italic 400 1.08rem/1.75 'Playfair Display',serif;white-space:pre-wrap;min-height:330px;max-height:60vh;overflow-y:auto;color:#f3efe4}
-  .caret::after{content:'▌';color:var(--gold);animation:blink .8s steps(1) infinite}
-
-  /* 9 finale */
-  #finale .prod{font:600 .72rem 'JetBrains Mono',monospace;letter-spacing:.35em;color:var(--muted);animation:fadeUp 1.2s both}
-  #finale .title{font:700 clamp(2.8rem,15vw,5rem)/.95 'Space Grotesk',sans-serif;letter-spacing:.02em;margin:18px 0 10px;
-    background:linear-gradient(100deg,#f7e3a8,#e8c16a 40%,#fff 50%,#e8c16a 60%,#b8893a);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:title 1.6s .3s both,shine 4s 2s linear infinite}
-  @keyframes title{from{opacity:0;letter-spacing:.35em;filter:blur(10px)}to{opacity:1;letter-spacing:.02em;filter:none}}
-  @keyframes shine{to{background-position:-250% 0}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  #finale .who{font:500 1.7rem 'Playfair Display',serif;font-style:italic;color:var(--gold);animation:fadeUp 1.2s 1.4s both}
-  .credits-mask{height:120px;overflow:hidden;margin:26px auto 4px;max-width:320px;-webkit-mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent);mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent)}
-  .credits{animation:roll 22s linear infinite;color:var(--muted);font:400 .78rem/1.9 'JetBrains Mono',monospace;letter-spacing:.06em}
-  .credits b{color:var(--ink);font-weight:600} .credits u{text-decoration:none;color:var(--gold);letter-spacing:.2em;font-size:.68rem}
-  @keyframes roll{from{transform:translateY(100px)}to{transform:translateY(-100%)}}
-
-  #music{position:fixed;top:14px;right:14px;z-index:95;width:40px;height:40px;padding:0;font-size:1.05rem;background:var(--glass);color:var(--ink);box-shadow:0 0 0 1px var(--line) inset;border-radius:50%}
-  #toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-120px);background:#14151d;color:var(--ink);border:1px solid var(--gold);padding:10px 18px;border-radius:12px;font-weight:500;font-size:.88rem;z-index:99;transition:transform .4s;max-width:88vw;text-align:center}
-  #toast.show{transform:translate(-50%,0)}
-  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<canvas id="fx"></canvas>
-<div id="progress"></div>
-<button id="music" aria-label="Music on/off">♪</button>
-<div id="toast"></div>
-
-<!-- -1: garden intro (touch the blossom) -->
-<section class="scene active" id="garden">
+<section id="garden">
   <canvas id="gardenCv"></canvas>
   <div id="gardenHint">Touch the blossom</div>
   <div id="blossom" role="button" tabindex="0" aria-label="Touch the blossom">
@@ -217,270 +43,12 @@
       <g fill="#e07a5f"><circle cx="0" cy="-11" r="1.8"/><circle cx="10.5" cy="-3.4" r="1.8"/><circle cx="6.5" cy="9" r="1.8"/><circle cx="-6.5" cy="9" r="1.8"/><circle cx="-10.5" cy="-3.4" r="1.8"/></g>
     </svg>
   </div>
-  <div id="gardenCard">
-    <div class="for">for <span class="nm"></span></div>
-    <div class="hb">Happy Birthday</div>
-    <p>Ek chhota sa garden, sirf tumhare liye.</p>
-    <div class="row" style="margin-top:14px"><button class="rose" id="gardenNext">Andar chalo &#9656;</button></div>
-  </div>
 </section>
-
-<!-- 0: lock -->
-<section class="scene" id="lock">
-  <div class="wrap">
-    <div class="clock" id="clock">00:00</div>
-    <div class="date" id="dateStr"></div>
-    <div class="badge"><i></i> 1 encrypted message &middot; for <b class="nm"></b></div>
-    <div class="holdzone" id="hold" tabindex="0" role="button" aria-label="Hold to unlock">
-      <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="54"/><circle class="prog" id="ring" cx="60" cy="60" r="54"/></svg>
-      <div class="core"><span>ENGINE<br>START</span></div>
-    </div>
-    <div id="holdHint">Dabaye rakho 👆</div>
-    <p class="sub">Press &amp; hold to start the engine</p>
-  </div>
-</section>
-
-<!-- 1: boot -->
-<section class="scene" id="boot">
-  <div class="wrap">
-    <div class="eyebrow">birthday_protocol.exe</div>
-    <div class="panel term" id="term"></div>
-    <div class="row"><button id="bootNext" style="display:none">Enter &#9656;</button></div>
-  </div>
-</section>
-
-<!-- 2: card -->
-<section class="scene" id="card">
-  <div class="wrap">
-    <div class="eyebrow">Spec sheet unlocked</div>
-    <div class="stage" style="margin-top:14px">
-      <div class="pcard" id="pcard">
-        <div class="pc-top"><div class="ovr">99</div><div class="pos">OVR &middot; HYPERCAR</div></div>
-        <div class="pc-name nm"></div>
-        <div class="pc-sub">BIRTHDAY EDITION &middot; LIMITED</div>
-        <div id="stats"></div>
-      </div>
-    </div>
-    <p class="sub" style="margin-top:14px">Card ko hilao, tilt hota hai 😎</p>
-    <div class="row"><button id="cardNext">Verdict dekho &#9656;</button></div>
-  </div>
-</section>
-
-<!-- 3: quiz -->
-<section class="scene" id="quiz">
-  <div class="wrap panel">
-    <div class="qtag" id="qTag"></div>
-    <h2 id="qText" style="margin-top:.5em"></h2>
-    <div class="opts" id="qOpts"></div>
-    <div class="react" id="qReact"></div>
-    <div class="row" style="margin-top:6px"><button id="qNext" style="display:none">Aage &#9656;</button></div>
-  </div>
-</section>
-
-<!-- 4: ask -->
-<section class="scene" id="ask">
-  <div class="wrap">
-    <div class="eyebrow">ek chhoti si request</div>
-    <h2 style="margin-top:.6em">2 minute ke liye thoda emotional ho jaayein?</h2>
-    <p class="sub">(Promise, sirf 2 minute. Phir wapas normal sarcasm.)</p>
-    <div class="arena" id="arena">
-      <button id="yes">Haan, ho jaate hain</button>
-      <button id="no" class="ghost">Nahi</button>
-    </div>
-    <p class="sub" id="askHint">Soch ke jawab dena.</p>
-  </div>
-</section>
-
-<!-- 4b: rev the engine -->
-<section class="scene" id="rev">
-  <div class="wrap">
-    <div class="eyebrow">dyno test</div>
-    <h2 style="margin-top:.6em">Gas dabao. Redline tak.</h2>
-    <div class="gauge" id="gauge"><svg viewBox="0 8 200 150" id="gsvg"></svg><div class="rpm"><span id="rpm">0</span> RPM<small>BIRTHDAY SPEC</small></div></div>
-    <div><button id="gas">HOLD TO REV</button></div>
-    <p class="sub" id="revHint" style="min-height:1.4em">Engine ko thoda pyaar chahiye.</p>
-  </div>
-</section>
-
-<!-- 5: cake -->
-<section class="scene" id="cake">
-  <div class="wrap">
-    <div class="eyebrow">make a wish</div>
-    <h2 style="margin-top:.6em">Pehle wish. Phir candles.</h2>
-    <p class="sub">Flames pe tap karo, ya mic mein phook maaro.</p>
-    <div class="cake">
-      <div class="candles" id="candles"></div>
-      <div class="tier t3"></div><div class="tier t2"></div><div class="tier t1"></div><div class="plate"></div>
-    </div>
-    <p id="cakeMsg" class="react" style="min-height:3em">0 / 5 candles bujhi hain</p>
-    <div class="row">
-      <button id="blowBtn" class="ghost">🎤 Phook maaro</button>
-      <button id="cakeNext" style="display:none">Wish ho gayi &#9656;</button>
-    </div>
-  </div>
-</section>
-
-<!-- 6: episodes -->
-<section class="scene" id="episodes">
-  <div class="wrap">
-    <div class="eyebrow">Season 1 &middot; renewed</div>
-    <h2 style="margin-top:.6em">Humari Story</h2>
-    <p class="sub">Episodes pe tap karo.</p>
-    <div class="eps" id="eps"></div>
-    <div class="row"><button id="epsNext">Next episode &#9656;</button></div>
-  </div>
-</section>
-
-<!-- gallery (only when CONFIG.photos is filled) -->
-<section class="scene" id="gallery">
-  <div class="wrap">
-    <div class="eyebrow">memories</div>
-    <div class="polaroid" id="polaroid"><img id="phImg" alt=""><p id="phCap"></p></div>
-    <div class="row"><button class="ghost" id="phPrev">&#9666;</button><button id="phNext">Next &#9656;</button></div>
-  </div>
-</section>
-
-<!-- 7: patch notes -->
-<section class="scene" id="patch">
-  <div class="wrap">
-    <div class="eyebrow">system update available</div>
-    <div class="panel patch" id="patchBox" style="margin-top:12px"></div>
-    <div class="pbar" id="pbar"><i id="pfill"></i></div>
-    <p class="sub" id="pmsg" style="min-height:1.4em"></p>
-    <div class="row"><button id="install" style="display:none">Install update</button></div>
-  </div>
-</section>
-
-<!-- 8: letter -->
-<section class="scene" id="letter">
-  <div class="wrap">
-    <div class="eyebrow">ek aakhri baat</div>
-    <div class="panel letter caret" id="letterText" style="margin-top:12px"></div>
-    <div class="row"><button id="skipType" class="ghost">Skip</button><button id="surprise" style="display:none">Last surprise &#9656;</button></div>
-  </div>
-</section>
-
-<!-- 9: finale -->
-<section class="scene" id="finale">
-  <div class="wrap">
-    <div class="prod">A <span class="fromName"></span> PRODUCTION</div>
-    <div class="title">HAPPY<br>BIRTHDAY</div>
-    <div class="who nm"></div>
-    <div class="credits-mask"><div class="credits" id="credits"></div></div>
-    <p class="sub">Kahin bhi tap karo ✨</p>
-    <div class="row"><button id="replay" class="ghost">Replay</button></div>
-  </div>
-</section>
-
 <script>
-/* =====================================================================
-   ✏️  YAHAN APNA CONTENT BADLO
-   ===================================================================== */
-const CONFIG = {
-  name: "Hero",            // birthday wale ka naam
-  from: "Koi Khaas",       // tumhara naam (letter ke end mein)
-
-  // Player card ke stats: [label, value 0-100, funny remark]
-  stats: [
-    ["STYLE",        96, "Paint job ekdum clean"],
-    ["TURBO (EGO)", 100, "Boost ka limit system ne hata diya"],
-    ["TOP SPEED",    88, "Jab khaana ready ho"],
-    ["0-100 REPLY",  23, "'Seen' ka champion"],
-    ["BRAKES",       41, "Gusse mein sudden stop nahi hota"],
-    ["FUEL TANK",   100, "Loyalty kabhi reserve pe nahi aati"]
-  ],
-
-  // "Humari Story": [title, description]  (apni real yaadein daalo!)
-  episodes: [
-    ["Pilot",            "Pehli baar mile, aur kisi ko andaaza nahi tha ki ye series itni lambi chalegi."],
-    ["Wo Pehli Ladai",   "Wajah yaad nahi (shayad route ya music ka scene tha). Par jeet kiski hui, ye dono ko yaad hai."],
-    ["Late Night Drives", "'Bas ek chakkar' = 3 ghante aur poori tanki. Phir bhi worth it."],
-    ["Inside Jokes",     "Kisi aur ko samajh nahi aate. Isliye aur bhi mazedaar."],
-    ["Aaj",              "Ek aur saal, ek aur season renewed. Netflix ko humse seekhna chahiye."]
-  ],
-
-  // Photos (optional). Files ko "photos" folder mein rakho:
-  //   photos: [["photos/1.jpg", "Caption"], ["photos/2.jpg", "Caption"]]
-  photos: []
-};
-/* Link se bhi badal sakte ho:  index.html?name=Rahul&from=Priya */
-const q = new URLSearchParams(location.search);
-if (q.get("name")) CONFIG.name = q.get("name").slice(0, 30);
-if (q.get("from")) CONFIG.from = q.get("from").slice(0, 30);
-document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
-document.querySelectorAll(".fromName").forEach(e => e.textContent = CONFIG.from.toUpperCase());
-document.title = `Happy Birthday ${CONFIG.name}`;
-
-/* ============ helpers ============ */
 const $ = s => document.querySelector(s);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => Math.random() * (b - a) + a;
 const pick = a => a[Math.floor(Math.random() * a.length)];
-let toastT;
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600); }
-
-/* ============ scene engine ============ */
-const order = ["garden","lock","boot","card","quiz","ask","rev","cake","episodes"]
-  .concat(CONFIG.photos.length ? ["gallery"] : [], ["patch","letter","finale"]);
-let cur = 0;
-const hooks = { garden: startGarden, boot: runBoot, card: showCard, quiz: showQ, ask: resetAsk, rev: startRev, patch: runPatch, letter: typeLetter, finale: runFinale, gallery: showPhoto };
-function go(n){
-  cur = typeof n === "number" ? n : order.indexOf(n);
-  document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
-  const s = $("#" + order[cur]); s.classList.add("active"); s.scrollTop = 0;
-  $("#progress").style.width = (cur / (order.length - 1) * 100) + "%";
-  document.body.classList.toggle("in-garden", order[cur] === "garden");
-  if (hooks[order[cur]]) hooks[order[cur]]();
-}
-const next = () => go(cur + 1);
-
-/* ============ background dust + pointer glow ============ */
-const bg = $("#bg"), bctx = bg.getContext("2d"), fx = $("#fx"), ctx = fx.getContext("2d");
-function resize(){ const r = devicePixelRatio || 1; for (const c of [bg, fx]) { c.width = innerWidth * r; c.height = innerHeight * r; c.getContext("2d").setTransform(r,0,0,r,0,0); } }
-addEventListener("resize", resize); resize();
-const dust = Array.from({length: 70}, () => ({x: rnd(0, innerWidth), y: rnd(0, innerHeight), r: rnd(.6, 2), vx: rnd(-.12, .12), vy: rnd(-.28, -.05), a: rnd(.15, .6), z: rnd(.2, 1)}));
-let px = 0, py = 0;
-addEventListener("pointermove", e => {
-  document.body.style.setProperty("--mx", e.clientX + "px"); document.body.style.setProperty("--my", e.clientY + "px");
-  px = (e.clientX / innerWidth - .5); py = (e.clientY / innerHeight - .5);
-});
-
-/* ============ confetti + fireworks ============ */
-let parts = [];
-const gold = ["#e8c16a","#f7e3a8","#fff","#7dd3fc","#b8893a"];
-function confetti(n = 120, x = innerWidth/2, y = innerHeight/2){
-  for (let i = 0; i < n; i++){ const a = rnd(0, Math.PI*2), s = rnd(3, 11);
-    parts.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s - 5, g:.22, life:rnd(80,140), c:gold[i%gold.length], w:rnd(4,9), h:rnd(2,5), r:rnd(0,6), vr:rnd(-.3,.3), type:"c"}); }
-}
-function firework(x, y){
-  const c = pick(gold);
-  for (let i = 0; i < 80; i++){ const a = (i/80)*Math.PI*2, s = rnd(2, 6.8);
-    parts.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, g:.06, life:rnd(50,85), c, w:3, h:3, r:0, vr:0, type:"f"}); }
-}
-const burstFireworks = n => { for (let i = 0; i < n; i++) setTimeout(() => firework(rnd(.15,.85)*innerWidth, rnd(.12,.5)*innerHeight), i*380); };
-(function loop(){
-  bctx.clearRect(0, 0, innerWidth, innerHeight);
-  for (const d of dust){
-    d.x += d.vx; d.y += d.vy; if (d.y < -4) { d.y = innerHeight + 4; d.x = rnd(0, innerWidth); } if (d.x < -4) d.x = innerWidth + 4; if (d.x > innerWidth + 4) d.x = -4;
-    bctx.globalAlpha = d.a; bctx.fillStyle = "#e8c16a";
-    bctx.beginPath(); bctx.arc(d.x + px*40*d.z, d.y + py*40*d.z, d.r, 0, 7); bctx.fill();
-  }
-  ctx.clearRect(0, 0, innerWidth, innerHeight);
-  parts = parts.filter(p => p.life > 0);
-  for (const p of parts){
-    p.x += p.vx; p.y += p.vy; p.vy += p.g; p.vx *= p.type==="f" ? .985 : .99; p.r += p.vr; p.life--;
-    ctx.globalAlpha = Math.min(1, p.life/30); ctx.fillStyle = p.c;
-    if (p.type === "c"){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); }
-    else { ctx.beginPath(); ctx.arc(p.x,p.y,p.w/2,0,7); ctx.fill(); }
-  }
-  ctx.globalAlpha = 1; requestAnimationFrame(loop);
-})();
-addEventListener("pointerdown", e => { if (order[cur] === "finale" && !e.target.closest("button")) firework(e.clientX, e.clientY); });
-
-/* ============ sound: soft generative ambient (no files) ============ */
-let ac, master, musicOn = false, musicTimer, bar = 0, step = 0;
-const prog = [[220,261.63,329.63,440],[174.61,220,261.63,349.23],[130.81,196,261.63,329.63],[196,246.94,293.66,392]];
-const pat = [0,1,2,3,2,1,2,1];
+let ac, master;
 function getAC(){
   if (!ac){ ac = new (window.AudioContext || window.webkitAudioContext)();
     master = ac.createGain(); master.gain.value = .9;
@@ -493,41 +61,9 @@ function tone(f, t, dur, vol, type = "sine"){
   g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
   o.connect(g).connect(master); o.start(t); o.stop(t + dur + .05);
 }
-function musicStep(){
-  if (!musicOn) return;
-  const ch = prog[bar], t = ac.currentTime + .05;
-  tone(ch[pat[step]], t, .9, .06, "triangle");
-  if (step === 0) tone(ch[0] / 2, t, 2.6, .08, "sine");
-  if (step % 4 === 2) tone(ch[3] * 2, t, 1.3, .025, "sine");
-  if (++step === 8){ step = 0; bar = (bar + 1) % prog.length; }
-  musicTimer = setTimeout(musicStep, 310);
-}
-function setMusic(on){
-  try { if (on) getAC(); musicOn = on; clearTimeout(musicTimer); if (on) musicStep(); $("#music").style.opacity = on ? 1 : .45; }
-  catch (e) { musicOn = false; }
-}
-$("#music").onclick = () => setMusic(!musicOn);
-/* engine sound (hold-to-rev) */
-let engine = null;
-function engineStart(){
-  if (engine || !musicOn) return;
-  try {
-    getAC(); const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
-    o.type = "sawtooth"; o2.type = "square"; f.type = "lowpass"; f.frequency.value = 600; o.frequency.value = 55; o2.frequency.value = 27.5;
-    g.gain.value = .0001; o.connect(f); o2.connect(f); f.connect(g).connect(master); o.start(); o2.start();
-    g.gain.linearRampToValueAtTime(.09, ac.currentTime + .15); engine = {o, o2, g, f};
-  } catch (e) {}
-}
-function engineSet(p){ if (!engine) return; const t = ac.currentTime, fr = 55 + p * 230;
-  engine.o.frequency.setTargetAtTime(fr, t, .05); engine.o2.frequency.setTargetAtTime(fr / 2, t, .05); engine.f.frequency.setTargetAtTime(500 + p * 1900, t, .05); }
-function engineStop(){ if (!engine) return; const e = engine; engine = null; e.g.gain.setTargetAtTime(.0001, ac.currentTime, .08);
-  setTimeout(() => { try { e.o.stop(); e.o2.stop(); } catch (_) {} }, 450); }
-function blip(f = 660, d = .08, v = .05){ if (!musicOn) return; try { tone(f, ac.currentTime, d, v, "sine"); } catch (e) {} }
-function chord(freqs, v = .07){ if (!musicOn) return; try { freqs.forEach((f, i) => tone(f, ac.currentTime + i*.05, 2.2, v, "triangle")); } catch (e) {} }
-document.addEventListener("pointerdown", e => { if (e.target.closest("button")) blip(560 + Math.random()*120); });
-setMusic(false);
+function blip(f = 660, d = .08, v = .05){ try { getAC(); tone(f, ac.currentTime, d, v, "sine"); } catch (e) {} }
+function chord(freqs, v = .07){ try { getAC(); freqs.forEach((f, i) => tone(f, ac.currentTime + i*.05, 2.2, v, "triangle")); } catch (e) {} }
 
-/* ============ -1: garden intro (touch the blossom -> flowers spread from the corner) ============ */
 const gcv = $("#gardenCv"), gctx = gcv.getContext("2d");
 const GCOL = ["#e5483b","#ee7a35","#9070d0","#5b94e6","#8fe0cc","#ffffff","#cbbfd0","#f6d86a","#f7b0c4","#78b08a"];
 const GSTYLE = ["poppy","poppy","anemone","anemone","ranunc","anemone","ranunc","ranunc","anemone","ranunc"];
@@ -576,28 +112,23 @@ let field = [], bloomT0 = 0, bloomState = "idle";   // idle | blooming | done
 function sizeGarden(){
   const r = devicePixelRatio || 1; gcv.width = innerWidth * r; gcv.height = innerHeight * r; gctx.setTransform(r, 0, 0, r, 0, 0);
 }
-/* The blossom lands at the bottom-left; flowers grow outward from that point and only
-   fill a patch around it (not the whole screen). */
+/* The blossom lands at the bottom-left; flowers grow outward from there until they cover the whole screen. */
 function gardenOrigin(){ return {x: 56, y: innerHeight - 56}; }
 function buildField(){
   const W = innerWidth, H = innerHeight, u = Math.max(.8, Math.min(1.5, Math.min(W, H) / 420)), O = gardenOrigin();
-  const R = Math.min(Math.hypot(W, H) * .5, Math.max(W, H) * .62);   // reach of the garden
+  const R = Math.hypot(W, H);   // distance to the farthest corner
   field = [];
   [[135, 130, 200], [98, 90, 135], [78, 62, 96]].forEach(([cell, smin, smax]) => {
     const step = cell * u;
     for (let y0 = -step / 2; y0 < H + step / 2; y0 += step) for (let x0 = -step / 2; x0 < W + step / 2; x0 += step){
       const x = x0 + rnd(0, step), y = y0 + rnd(0, step), d = Math.hypot(x - O.x, y - O.y);
-      const keep = Math.max(0, Math.min(1, (R * 1.12 - d) / (R * .42)));        // fully dense near the corner, thins out at the edge
-      if (Math.random() > keep) continue;
-      const shrink = 1 - .32 * Math.min(1, d / R);                                // smaller toward the edge
-      field.push({x, y, size: rnd(smin, smax) * u * shrink, sp: pick(sprites), rot: rnd(0, 6.283), ph: rnd(0, 6.283),
-        delay: d / R * 2800 + rnd(0, 260)});
+      field.push({x, y, size: rnd(smin, smax) * u, sp: pick(sprites), rot: rnd(0, 6.283), ph: rnd(0, 6.283),
+        delay: d / R * 3400 + rnd(0, 260)});
     }
   });
 }
 const easeOutBack = p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
 function gardenFrame(now){
-  if (order[cur] !== "garden") return;
   gctx.clearRect(0, 0, innerWidth, innerHeight);
   if (bloomState !== "idle"){
     const t = now - bloomT0, calm = bloomState === "done"; let allDone = true;
@@ -610,19 +141,15 @@ function gardenFrame(now){
       gctx.rotate(f.rot - (1 - p) * 1.2 + (calm ? Math.sin(now / 1700 + f.ph) * .04 : 0));
       gctx.globalAlpha = Math.min(1, p * 2.2); gctx.drawImage(f.sp, -s / 2, -s / 2, s, s); gctx.restore();
     }
-    if (bloomState === "blooming" && allDone){ bloomState = "done"; $("#gardenCard").classList.add("show"); chord([392, 523.25, 659.25], .06); }
+    if (bloomState === "blooming" && allDone){ bloomState = "done"; chord([392, 523.25, 659.25], .06); }
   }
   requestAnimationFrame(gardenFrame);
 }
-function startGarden(){
-  bloomState = "idle"; sizeGarden(); buildField();
-  $("#garden").classList.remove("go"); $("#gardenCard").classList.remove("show");
-  requestAnimationFrame(gardenFrame);
-}
-addEventListener("resize", () => { if (order[cur] === "garden"){ sizeGarden(); buildField(); } });
+sizeGarden(); buildField(); requestAnimationFrame(gardenFrame);
+addEventListener("resize", () => { sizeGarden(); buildField(); });
 function touchBlossom(){
   if (bloomState !== "idle") return;
-  setMusic(true); $("#garden").classList.add("go");
+  getAC(); $("#garden").classList.add("go");
   const b = $("#blossom"); b.style.animation = "none"; b.style.pointerEvents = "none"; b.classList.add("fell");
   // fall from the top-right corner, swaying, down to the bottom-left landing point
   const r = b.getBoundingClientRect(), O = gardenOrigin(), FALL = 2600;
@@ -639,286 +166,6 @@ function touchBlossom(){
 }
 $("#blossom").addEventListener("pointerdown", e => { e.preventDefault(); touchBlossom(); });
 $("#blossom").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") touchBlossom(); });
-$("#gardenNext").onclick = async () => {
-  const sc = $("#garden"), a = sc.animate([{opacity: 1}, {opacity: 0}], {duration: 800, fill: "forwards"});
-  await a.finished; go("lock"); a.cancel();
-};
-
-/* ============ 0: lock (hold to unlock) ============ */
-const CIRC = 2 * Math.PI * 54, ring = $("#ring");
-ring.style.strokeDasharray = CIRC; ring.style.strokeDashoffset = CIRC;
-function tickClock(){ const d = new Date(); $("#clock").textContent = d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", hour12:false}); $("#dateStr").textContent = d.toLocaleDateString([], {weekday:"long", day:"numeric", month:"long"}); }
-tickClock(); setInterval(tickClock, 15000);
-const holdHints = ["Itni jaldi? Engine abhi cold hai", "Aur dabaye rakho...", "Stall ho gayi 😏 Ek baar aur", "Clutch chhodna mat, bas button dabao"];
-let holdStart = 0, holdRAF = 0, unlocked = false, tries = 0;
-function holdTick(){
-  const p = Math.min(1, (performance.now() - holdStart) / 1300);
-  ring.style.strokeDashoffset = CIRC * (1 - p); engineSet(p * .7);
-  if (p >= 1) return unlock();
-  holdRAF = requestAnimationFrame(holdTick);
-}
-function holdStartFn(e){ if (unlocked || holdStart) return; if (e && e.preventDefault) e.preventDefault();
-  setMusic(true); engineStart(); holdStart = performance.now(); $("#hold").classList.add("on"); $("#holdHint").textContent = "Engine garam ho raha hai..."; holdTick(); }
-function holdEnd(){ if (unlocked || !holdStart) return;
-  engineStop(); cancelAnimationFrame(holdRAF); holdStart = 0; $("#hold").classList.remove("on");
-  ring.style.transition = "stroke-dashoffset .4s"; ring.style.strokeDashoffset = CIRC; setTimeout(() => ring.style.transition = "", 420);
-  $("#holdHint").textContent = holdHints[Math.min(tries++, holdHints.length - 1)]; }
-async function unlock(){
-  unlocked = true; $("#hold").classList.remove("on"); $("#holdHint").textContent = "Engine on ✓ Vroooom";
-  engineSet(1); setTimeout(engineStop, 500);
-  $("#lock").classList.add("flash"); chord([261.63, 329.63, 392, 523.25]); confetti(60, innerWidth/2, innerHeight/2);
-  await sleep(1000); go("boot");
-}
-const hz = $("#hold");
-hz.addEventListener("pointerdown", holdStartFn);
-["pointerup","pointerleave","pointercancel"].forEach(ev => hz.addEventListener(ev, holdEnd));
-hz.addEventListener("contextmenu", e => e.preventDefault());
-hz.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && !e.repeat) holdStartFn(e); });
-hz.addEventListener("keyup", e => { if (e.key === "Enter" || e.key === " ") holdEnd(); });
-
-/* ============ 1: boot ============ */
-const bootLines = [
-  ["$ ./birthday_protocol.exe --target=" + CONFIG.name, "", "dim"],
-  ["> locating driver ........ ", "FOUND", "ok"],
-  ["> scanning age ........ ", "[REDACTED]", "warn"],
-  ["> checking oil, tyres, ego ........ ", "EGO OVERFLOW", "bad"],
-  ["> loading gift ........ ", "FAILED (in-person delivery)", "warn"],
-  ["> bribing the cake ........ ", "SUCCESS", "ok"],
-  ["> status: ", "ENGINE READY. AB DEKHO.", "ok"]
-];
-let bootTok = 0;
-async function runBoot(){
-  const tok = ++bootTok, term = $("#term"); term.innerHTML = ""; $("#bootNext").style.display = "none";
-  for (const [left, right, cls] of bootLines){
-    const line = document.createElement("div"); const l = document.createElement("span"); l.className = "cur"; line.appendChild(l); term.appendChild(line);
-    for (const ch of left){ if (tok !== bootTok) return; l.textContent += ch; await sleep(14); }
-    l.classList.remove("cur");
-    if (right){ await sleep(260); const r = document.createElement("span"); r.className = cls; r.textContent = right; line.appendChild(r); blip(cls === "bad" ? 220 : 880, .1, .04); }
-    await sleep(240);
-  }
-  if (tok === bootTok) $("#bootNext").style.display = "inline-block";
-}
-$("#bootNext").onclick = next;
-
-/* ============ 2: player card ============ */
-const statsBox = $("#stats");
-CONFIG.stats.forEach(([label, val, note]) => {
-  const d = document.createElement("div"); d.className = "stat";
-  d.innerHTML = `<div class="l"><span></span><span></span></div><div class="b"><i></i></div><small></small>`;
-  const sp = d.querySelectorAll(".l span"); sp[0].textContent = label; sp[1].textContent = val;
-  d.querySelector("small").textContent = note; d.dataset.v = val; statsBox.appendChild(d);
-});
-function showCard(){
-  statsBox.querySelectorAll(".stat").forEach((s, i) => { const bar = s.querySelector("i"); bar.style.width = "0"; setTimeout(() => bar.style.width = s.dataset.v + "%", 250 + i*140); });
-  setTimeout(() => $("#pcard").style.setProperty("--sx", "100%"), 900);
-}
-const pc = $("#pcard");
-$("#card").addEventListener("pointermove", e => {
-  const r = pc.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-  pc.style.transform = `rotateY(${x * 18}deg) rotateX(${-y * 14}deg)`;
-});
-$("#card").addEventListener("pointerleave", () => pc.style.transform = "");
-$("#cardNext").onclick = next;
-
-/* ============ 3: quiz ============ */
-const quiz = [
-  { q: "Aaj ki sabse important insaan kaun hai?",
-    o: [["Main (obviously)", "Confidence hai, achha laga. Sahi jawab."],
-        ["Wo jisne ye link bheja", "Smart choice. Credit lena bhi aata hai."],
-        ["Cake", "Cake ko bhi tumse competition hai, tension mat lo."]] },
-  { q: "Birthday pe sabse zaroori kya hai?",
-    o: [["Cake", "Valid. Par ye website bhi to hai."],
-        ["Gift", "Gift pending hai. Tumhari patience ka test chal raha hai."],
-        ["Ek lambi drive", "Drive pending hai. Petrol tumhara 😂"]] },
-  { q: "Age kitni ho gayi?",
-    o: [["21 (permanent)", "Haan haan, 21 ka 'part 9' chal raha hai."],
-        ["Number sirf ek value hai", "Ye line main note kar raha/rahi hu. Next time kaam aayegi."],
-        ["Kyun? Budhaa lag raha hu?", "Nahi nahi, aisa kuch nahi. Bas thoda experienced 😌"]] }
-];
-let qi = 0;
-function showQ(){
-  const d = quiz[qi];
-  $("#qTag").textContent = `VERDICT ${qi+1}/${quiz.length}`; $("#qText").textContent = d.q; $("#qReact").textContent = "";
-  $("#qNext").style.display = "none"; $("#qNext").textContent = qi === quiz.length - 1 ? "Aage ▸" : "Next ▸";
-  const box = $("#qOpts"); box.innerHTML = "";
-  d.o.forEach(([label, reply]) => {
-    const b = document.createElement("button"); b.className = "opt"; b.textContent = label;
-    b.onclick = () => { [...box.children].forEach(x => x.disabled = true); b.classList.add("picked"); b.disabled = false; b.style.pointerEvents = "none";
-      $("#qReact").textContent = reply; const r = b.getBoundingClientRect(); confetti(30, r.left + r.width/2, r.top); $("#qNext").style.display = "inline-block"; };
-    box.appendChild(b);
-  });
-}
-$("#qNext").onclick = () => { if (qi < quiz.length - 1) { qi++; showQ(); } else { qi = 0; next(); } };
-
-/* ============ 4: runaway "No" ============ */
-const noLines = ["Nahi", "Pakka?", "Soch lo ek baar", "2 minute hi to hain", "Itna attitude?", "Theek hai, zabardasti hi sahi", "Button thak gaya", "Haar maan lo"];
-let dodges = 0;
-function resetAsk(){ dodges = 0; $("#no").textContent = "Nahi"; $("#no").style.left = "58%"; $("#no").style.top = "128px"; $("#yes").style.transform = "translateX(-50%) scale(1)"; $("#askHint").textContent = "Soch ke jawab dena."; }
-function dodge(e){
-  if (e) { e.preventDefault(); e.stopPropagation(); }
-  dodges++;
-  const a = $("#arena"), no = $("#no");
-  no.style.left = rnd(0, a.clientWidth - no.offsetWidth) + "px"; no.style.top = rnd(70, a.clientHeight - no.offsetHeight) + "px";
-  no.textContent = noLines[Math.min(dodges, noLines.length - 1)];
-  $("#yes").style.transform = `translateX(-50%) scale(${Math.min(1 + dodges * .14, 1.7)})`;
-  if (dodges === 3) toast("'Nahi' button bhaag raha hai");
-  if (dodges === 6) $("#askHint").textContent = "'Haan' bada hota ja raha hai. Signal samajh lo.";
-}
-["pointerenter","pointerdown","click","touchstart"].forEach(ev => $("#no").addEventListener(ev, dodge, {passive:false}));
-$("#yes").onclick = async () => { confetti(100); toast("Done. Timer start: 2:00"); await sleep(1300); next(); };
-
-/* ============ 4b: rev the engine (hold accelerator to redline) ============ */
-(function buildGauge(){
-  const cx = 100, cy = 100, pt = (r, a) => [cx + r * Math.cos(a * Math.PI / 180), cy + r * Math.sin(a * Math.PI / 180)];
-  let s = "";
-  const arc = (a1, a2, r, col, w) => { const [x1, y1] = pt(r, a1), [x2, y2] = pt(r, a2);
-    return `<path d="M${x1} ${y1} A${r} ${r} 0 ${a2 - a1 > 180 ? 1 : 0} 1 ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`; };
-  s += arc(150, 390, 84, "rgba(255,255,255,.12)", 5) + arc(330, 390, 84, "#ff4d4d", 5);
-  s += `<path id="gfill" d="" fill="none" stroke="#e8c16a" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(232,193,106,.8))"/>`;
-  for (let i = 0; i <= 8; i++){ const a = 150 + i * 30, [x1, y1] = pt(70, a), [x2, y2] = pt(78, a), [tx, ty] = pt(58, a);
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${i >= 7 ? "#ff4d4d" : "#8d94a9"}" stroke-width="2"/><text x="${tx}" y="${ty + 4}" fill="${i >= 7 ? "#ff4d4d" : "#eceff7"}" font-size="11" font-family="Space Grotesk" text-anchor="middle">${i}</text>`; }
-  s += `<g id="needle"><line x1="100" y1="100" x2="168" y2="100" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/><line x1="100" y1="100" x2="86" y2="100" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/></g><circle cx="100" cy="100" r="7" fill="#1a1d27" stroke="#e8c16a" stroke-width="2"/>`;
-  $("#gsvg").innerHTML = s;
-  $("#gsvg").dataset.ready = "1";
-})();
-let revP = 0, revHeld = false, revRAF = 0, revLast = 0, revDone = false;
-const revHints = [[.0, "Engine ko thoda pyaar chahiye."], [.35, "Sun rahe ho? Ye music hai 🎶"], [.65, "Aur thoda... redline paas hai"], [.9, "BAS! Ek second aur!"]];
-function revDraw(){
-  const a = 150 + revP * 240; $("#needle").setAttribute("transform", `rotate(${a} 100 100)`);
-  $("#rpm").textContent = Math.round(revP * 8000);
-  const cx = 100, cy = 100, r = 84, pt = ang => [cx + r * Math.cos(ang * Math.PI / 180), cy + r * Math.sin(ang * Math.PI / 180)];
-  const [x1, y1] = pt(150), [x2, y2] = pt(a);
-  $("#gfill").setAttribute("d", revP > .005 ? `M${x1} ${y1} A${r} ${r} 0 ${a - 150 > 180 ? 1 : 0} 1 ${x2} ${y2}` : "");
-  $("#gauge").classList.toggle("hot", revP > .85);
-  if (!revDone) { let h = revHints[0][1]; for (const [t, m] of revHints) if (revP >= t) h = m; $("#revHint").textContent = h; }
-}
-function revLoop(now){
-  if (order[cur] !== "rev") return;
-  const dt = Math.min(.05, (now - revLast) / 1000 || 0); revLast = now;
-  revP = Math.max(0, Math.min(1, revP + (revHeld ? .42 : -.7) * dt));
-  engineSet(revP); revDraw();
-  if (revP >= 1 && !revDone) return redline();
-  revRAF = requestAnimationFrame(revLoop);
-}
-function startRev(){ revP = 0; revHeld = false; revDone = false; $("#gas").disabled = false; revDraw(); cancelAnimationFrame(revRAF); revLast = performance.now(); revRAF = requestAnimationFrame(revLoop); }
-async function redline(){
-  revDone = true; $("#gas").disabled = true; $("#revHint").textContent = "REDLINE! Birthday mode: ON";
-  confetti(220); burstFireworks(3); chord([261.63, 329.63, 392, 523.25], .09); setTimeout(engineStop, 600);
-  await sleep(1800); next();
-}
-const gas = $("#gas");
-gas.addEventListener("pointerdown", e => { e.preventDefault(); revHeld = true; setMusic(true); engineStart(); });
-["pointerup","pointerleave","pointercancel"].forEach(ev => gas.addEventListener(ev, () => { revHeld = false; if (!revDone) engineSet(revP); }));
-gas.addEventListener("contextmenu", e => e.preventDefault());
-addEventListener("keydown", e => { if (order[cur] === "rev" && (e.key === " " || e.key === "ArrowUp")) { revHeld = true; engineStart(); } });
-addEventListener("keyup", e => { if (e.key === " " || e.key === "ArrowUp") revHeld = false; });
-// engine should stop when leaving the rev scene without finishing
-const _go = go; go = function(n){ if (order[cur] === "rev" && !revDone) engineStop(); _go(n); };
-
-/* ============ 5: cake ============ */
-let blown = 0; const NC = 5, cd = $("#candles");
-for (let i = 0; i < NC; i++){ const c = document.createElement("div"); c.className = "candle"; c.innerHTML = '<div class="flame"></div>'; c.onclick = () => blow(c); cd.appendChild(c); }
-const cakeLines = ["0 / 5 candles bujhi hain", "1 gayi. Aur zor lagao.", "2 ho gayi, aadha kaam baaki", "3. Wish soch li na?", "4... bas ek aur"];
-function blow(c){
-  if (c.classList.contains("out")) return;
-  c.classList.add("out"); blown++; blip(300, .15, .05);
-  if (blown < NC) { $("#cakeMsg").textContent = cakeLines[blown]; return; }
-  $("#cakeMsg").textContent = "Wish pakki. Kisi ko batana mat, warna poori nahi hogi (mujhe bata sakte ho).";
-  confetti(200); chord([261.63, 329.63, 392]); setTimeout(() => confetti(100), 400);
-  $("#blowBtn").style.display = "none"; $("#cakeNext").style.display = "inline-block";
-}
-$("#blowBtn").onclick = async () => {
-  try {
-    const s = await navigator.mediaDevices.getUserMedia({audio:true});
-    const mc = new (window.AudioContext || window.webkitAudioContext)(), an = mc.createAnalyser(); an.fftSize = 512;
-    mc.createMediaStreamSource(s).connect(an); const buf = new Uint8Array(an.fftSize); toast("Ab zor se phook maaro"); let hot = 0;
-    const stop = () => { clearInterval(iv); s.getTracks().forEach(t => t.stop()); mc.close(); };
-    const iv = setInterval(() => {
-      an.getByteTimeDomainData(buf); let peak = 0; for (const v of buf) peak = Math.max(peak, Math.abs(v - 128));
-      hot = peak > 55 ? hot + 1 : Math.max(0, hot - 1);
-      if (hot >= 3) { stop(); [...cd.children].forEach((c, i) => setTimeout(() => blow(c), i * 160)); }
-    }, 80);
-    setTimeout(stop, 15000);
-  } catch (e) { toast("Mic nahi mila. Flames pe tap karo."); }
-};
-$("#cakeNext").onclick = next;
-
-/* ============ 6: episodes ============ */
-CONFIG.episodes.forEach(([title, desc], i) => {
-  const e = document.createElement("div"); e.className = "ep";
-  e.innerHTML = `<div class="h"><span class="code"></span><span class="t"></span><span class="pl">&#9654;</span></div><div class="d"></div>`;
-  e.querySelector(".code").textContent = `S01·E0${i+1}`; e.querySelector(".t").textContent = title; e.querySelector(".d").textContent = desc;
-  e.onclick = () => { const was = e.classList.contains("open"); document.querySelectorAll(".ep").forEach(x => x.classList.remove("open")); if (!was) e.classList.add("open"); blip(740); };
-  $("#eps").appendChild(e);
-});
-$("#epsNext").onclick = next;
-
-/* ============ gallery ============ */
-let pi = 0;
-function showPhoto(){ const [src, cap] = CONFIG.photos[pi]; $("#phImg").src = src; $("#phCap").textContent = cap || ""; $("#polaroid").style.transform = `rotate(${pi % 2 ? 2 : -2}deg)`; }
-$("#phNext").onclick = () => { if (pi < CONFIG.photos.length - 1) { pi++; showPhoto(); } else next(); };
-$("#phPrev").onclick = () => { if (pi > 0) { pi--; showPhoto(); } };
-
-/* ============ 7: patch notes ============ */
-const patchLines = [
-  ["add", "+ ADDED: 1 saal ka extra mileage (no refund)"],
-  ["add", "+ ADDED: turbo boost. Kisi ne maanga nahi tha"],
-  ["imp", "~ IMPROVED: smile. Ab meri battery bhi charge kar deti hai"],
-  ["rem", "- REMOVED: 'main busy hu' ka excuse"],
-  ["iss", "! KNOWN ISSUE: treat aur long drive abhi bhi pending hain"],
-  ["iss", "! KNOWN ISSUE: is update ke baad bhi tum sabse pasandida insaan ho. No fix planned."]
-];
-let patchTok = 0;
-async function runPatch(){
-  const tok = ++patchTok, box = $("#patchBox"); $("#install").style.display = "none"; $("#pbar").style.display = "none"; $("#pmsg").textContent = "";
-  box.innerHTML = `<div class="v"></div>`; box.querySelector(".v").textContent = "v" + (new Date().getFullYear() % 100) + ".0 · Birthday Update";
-  await sleep(500);
-  for (const [cls, txt] of patchLines){
-    if (tok !== patchTok) return; const d = document.createElement("div"); d.className = "ln " + cls; d.textContent = txt; box.appendChild(d);
-    void d.offsetWidth; d.classList.add("show"); blip(500, .06, .03); await sleep(650);
-  }
-  if (tok === patchTok) $("#install").style.display = "inline-block";
-}
-$("#install").onclick = async () => {
-  $("#install").style.display = "none"; $("#pbar").style.display = "block"; const f = $("#pfill"), m = $("#pmsg");
-  const msgs = ["Downloading...", "Installing...", "Restarting dil...", "Almost there..."];
-  for (let p = 0; p <= 100; p += 4){ f.style.width = p + "%"; m.textContent = msgs[Math.min(3, Math.floor(p / 26))]; await sleep(60); }
-  m.textContent = "Update complete ✓"; confetti(140); chord([329.63, 415.3, 493.88]); await sleep(1300); next();
-};
-
-/* ============ 8: letter ============ */
-const letterText =
-`${CONFIG.name},
-
-Aaj ke din ke liye kuch bada likhna chahiye tha. Do ghante soch ke bhi koi "perfect" line nahi mili. Toh seedhi baat: tum meri life ke un logon mein ho jinke bina story boring ho jaati hai.
-
-Tumhare hasne se baaki sabka din bhi theek ho jaata hai. Tumhare gusse ke baare mein... chalo, aaj us par baat nahi karte. Aaj ke din sab maaf.
-
-Is saal ke liye bas itna chahiye: engine hamesha smooth, signal hamesha green, fuel kabhi reserve pe na aaye, wo saari cheezein jo tum chupke se maangte ho (shayad ek dream car bhi), aur thoda kam late reply. Thoda.
-
-Jo bhi ho, jahan bhi ho, tumhare saath ka har safar ek scene hai. Aur mere liye tum hamesha pehle ho.
-
-Happy Birthday, ${CONFIG.name}.
-
-— ${CONFIG.from}`;
-let typing = false, typeAbort = false;
-async function typeLetter(){
-  if (typing) return; typing = true; typeAbort = false;
-  const el = $("#letterText"); el.textContent = ""; el.classList.add("caret"); $("#surprise").style.display = "none"; $("#skipType").style.display = "inline-block";
-  const chars = [...letterText];
-  for (let i = 0; i < chars.length && !typeAbort; i++){ el.textContent += chars[i]; el.scrollTop = el.scrollHeight; await sleep(chars[i] === "\n" ? 150 : 28); }
-  el.textContent = letterText; el.classList.remove("caret"); $("#skipType").style.display = "none"; $("#surprise").style.display = "inline-block"; typing = false;
-}
-$("#skipType").onclick = () => { typeAbort = true; };
-$("#surprise").onclick = () => { confetti(160); next(); };
-
-/* ============ 9: finale ============ */
-const credits = [["STARRING", ""], [CONFIG.name, "b"], ["", ""], ["CAST", ""], ["Cake: as itself (eaten)", ""], ["Treat: pending", ""], ["Long drive: pending", ""], ["Dream car: in progress", ""], ["", ""], ["SPECIAL THANKS", ""], ["Tumhari patience", ""], ["Meri bakwaas", ""], ["", ""], ["NO EGOS WERE HARMED*", "b"], ["*wo pehle se hi bade the", ""]];
-$("#credits").innerHTML = credits.map(([t, c]) => t === t.toUpperCase() && t && c !== "b" ? `<u>${t}</u>` : c === "b" ? `<b>${t}</b>` : t).map(x => `<div>${x || "&nbsp;"}</div>`).join("");
-function runFinale(){ chord([261.63, 329.63, 392, 523.25], .09); burstFireworks(7); setTimeout(() => burstFireworks(4), 3500); }
-$("#replay").onclick = () => location.reload();
-
-go(0);
 </script>
 </body>
 </html>
