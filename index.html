@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday! 🎂</title>
+<meta name="theme-color" content="#2a0a3d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#2a0a3d; --bg2:#7a1f5c; --bg3:#ff6b9d;
+    --card:rgba(255,255,255,.12); --card-b:rgba(255,255,255,.28);
+    --text:#fff; --muted:#ffd9ec; --accent:#ffd166; --pink:#ff4d8d;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:'Poppins',system-ui,sans-serif; color:var(--text);
+    background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,var(--bg3));
+    background-attachment:fixed; overflow:hidden;
+  }
+  #floaters{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .floater{position:absolute;bottom:-60px;opacity:.0;animation:rise linear forwards;will-change:transform}
+  @keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.8}100%{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+  canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+
+  .scene{
+    position:fixed;inset:0;z-index:1;display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px 16px 70px;text-align:center;overflow-y:auto;
+  }
+  .scene.active{display:flex;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:none}}
+  .wrap{width:100%;max-width:440px;margin:auto}
+  h1,h2{font-family:'Pacifico',cursive;font-weight:400;margin:.2em 0 .3em;text-shadow:0 3px 14px rgba(0,0,0,.35)}
+  h1{font-size:clamp(2.2rem,9vw,3.2rem)} h2{font-size:clamp(1.6rem,6.5vw,2.2rem)}
+  p{line-height:1.55;margin:.4em 0}
+  .sub{color:var(--muted);font-size:.95rem}
+  .big{font-size:5.5rem;line-height:1;display:inline-block;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))}
+
+  button{
+    font:inherit;font-weight:600;color:#3a0d2e;background:linear-gradient(180deg,#ffe08a,#ffb347);
+    border:0;border-radius:999px;padding:14px 26px;font-size:1.02rem;cursor:pointer;
+    box-shadow:0 6px 0 #c77d12,0 12px 22px rgba(0,0,0,.3);transition:transform .12s,box-shadow .12s;
+  }
+  button:active{transform:translateY(4px);box-shadow:0 2px 0 #c77d12,0 6px 12px rgba(0,0,0,.3)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.pink{color:#fff;background:linear-gradient(180deg,#ff7aa8,#ff2e7e);box-shadow:0 6px 0 #b0124f,0 12px 22px rgba(0,0,0,.3)}
+  button.ghost{background:var(--card);color:#fff;box-shadow:none;border:1px solid var(--card-b)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+
+  .card{background:var(--card);border:1px solid var(--card-b);border-radius:22px;padding:18px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+  /* gift */
+  #gift .big{animation:wiggle 1.6s ease-in-out infinite;cursor:pointer;font-size:8rem}
+  @keyframes wiggle{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.08)}}
+  #gift.opening .big{animation:shake .5s linear}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-8deg)}40%{transform:translateX(14px) rotate(8deg)}60%{transform:translateX(-10px)}80%{transform:translateX(10px)}}
+
+  /* loader */
+  .bar{height:22px;border-radius:99px;background:rgba(0,0,0,.3);overflow:hidden;border:1px solid var(--card-b);margin:18px 0 10px}
+  .bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,#ff4d8d 0 14px,#ff86b3 14px 28px);transition:width .4s;animation:stripes 1s linear infinite;background-size:40px 40px}
+  @keyframes stripes{to{background-position:40px 0}}
+  #loadMsg{min-height:3em;color:var(--muted)}
+
+  /* quiz */
+  .qtag{display:inline-block;background:var(--accent);color:#3a0d2e;font-weight:700;border-radius:99px;padding:3px 12px;font-size:.8rem}
+  .opts{display:grid;gap:10px;margin-top:14px}
+  .opt{background:var(--card);color:#fff;border:1px solid var(--card-b);box-shadow:none;text-align:left;border-radius:16px;padding:13px 16px}
+  .opt:active{transform:scale(.98);box-shadow:none}
+  .react{min-height:3.4em;margin-top:14px;color:var(--accent);font-weight:600}
+
+  /* runaway */
+  .arena{position:relative;height:210px;width:100%;margin-top:10px}
+  #yes{position:absolute;left:50%;top:30px;transform:translateX(-50%) scale(1);transition:transform .25s}
+  #no{position:absolute;left:60%;top:130px;transition:left .22s,top .22s;white-space:nowrap}
+
+  /* cake */
+  .cake{position:relative;width:230px;height:210px;margin:34px auto 6px}
+  .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:14px 14px 10px 10px;box-shadow:inset 0 -8px 0 rgba(0,0,0,.12)}
+  .t1{bottom:0;width:230px;height:70px;background:#ff8fb8}
+  .t2{bottom:70px;width:170px;height:60px;background:#ffd1e3}
+  .t3{bottom:130px;width:110px;height:46px;background:#ff8fb8}
+  .drip{position:absolute;top:0;left:0;right:0;height:16px;background:#fff;border-radius:14px 14px 40% 40%/14px 14px 100% 100%;opacity:.9}
+  .plate{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:260px;height:14px;border-radius:50%;background:rgba(255,255,255,.7)}
+  .candles{position:absolute;bottom:176px;left:50%;transform:translateX(-50%);display:flex;gap:11px}
+  .candle{position:relative;width:11px;height:44px;background:repeating-linear-gradient(0deg,#fff 0 8px,#8ad7ff 8px 16px);border-radius:3px;cursor:pointer}
+  .flame{position:absolute;left:50%;top:-26px;width:14px;height:24px;margin-left:-7px;background:radial-gradient(circle at 50% 70%,#fff 0 20%,#ffd166 40%,#ff7a18 80%);border-radius:50% 50% 50% 50%/65% 65% 35% 35%;animation:flick .18s infinite alternate;filter:drop-shadow(0 0 10px #ffb347)}
+  @keyframes flick{from{transform:scale(1,1) rotate(-4deg)}to{transform:scale(.88,1.1) rotate(4deg)}}
+  .candle.out .flame{display:none}
+  .candle.out::after{content:'💨';position:absolute;top:-34px;left:-5px;font-size:20px;animation:smoke 1.2s forwards}
+  @keyframes smoke{to{transform:translateY(-40px);opacity:0}}
+
+  /* flip cards */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .flip{perspective:800px;height:150px;cursor:pointer}
+  .flip .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+  .flip.on .in{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;padding:10px;font-size:.82rem;line-height:1.4}
+  .front{background:linear-gradient(135deg,#ff7aa8,#b44bff);font-weight:700;font-size:1.05rem;flex-direction:column;gap:4px;border:1px solid var(--card-b)}
+  .front b{font-size:2rem}
+  .back{background:#fff;color:#4a1237;transform:rotateY(180deg);font-weight:500}
+
+  /* coupons */
+  .coupon{display:flex;align-items:center;gap:12px;text-align:left;margin-top:10px;background:#fff7e0;color:#4a2a00;border-radius:16px;padding:12px 14px;border:2px dashed #e0a21a;cursor:pointer;transition:transform .2s,opacity .3s}
+  .coupon .e{font-size:2rem}
+  .coupon small{display:block;opacity:.7}
+  .coupon.used{opacity:.55;filter:grayscale(.6);text-decoration:line-through;pointer-events:none}
+  .coupon.used::after{content:'REDEEMED ✅';position:absolute}
+
+  /* letter */
+  .letter{text-align:left;white-space:pre-wrap;font-size:.98rem;line-height:1.65;min-height:320px;max-height:56vh;overflow-y:auto}
+  .caret::after{content:'▌';animation:blink .7s infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* finale */
+  #finale h1{font-size:clamp(2.4rem,11vw,4rem);background:linear-gradient(90deg,#ffd166,#ff4d8d,#b44bff,#ffd166);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite;text-shadow:none}
+  @keyframes shine{to{background-position:300% 0}}
+
+  #dots{position:fixed;bottom:14px;left:0;right:0;display:flex;gap:7px;justify-content:center;z-index:60;pointer-events:none}
+  #dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:.3s}
+  #dots i.on{background:#ffd166;width:22px;border-radius:8px}
+  #music{position:fixed;top:12px;right:12px;z-index:70;width:44px;height:44px;padding:0;font-size:1.2rem;box-shadow:none;background:var(--card);color:#fff;border:1px solid var(--card-b)}
+  #toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-120px);background:#fff;color:#4a1237;padding:10px 18px;border-radius:99px;font-weight:600;font-size:.9rem;z-index:80;transition:transform .4s;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:90vw;text-align:center}
+  #toast.show{transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+
+<div id="floaters"></div>
+<canvas id="fx"></canvas>
+<button id="music" aria-label="Music on/off" title="Music">🔇</button>
+<div id="toast"></div>
+
+<!-- 0: gift -->
+<section class="scene active" id="gift">
+  <div class="wrap">
+    <p class="sub">Psst... <span class="nm"></span>, ek chhoti si cheez hai tumhare liye 👀</p>
+    <div class="big" id="giftBox">🎁</div>
+    <h2>Isko kholo na!</h2>
+    <p class="sub">(Sirf <b>tum</b> khol sakti ho. Baaki sab ke liye ye bomb hai 💣)</p>
+    <div class="row"><button id="openGift">Tap to open 🎀</button></div>
+  </div>
+</section>
+
+<!-- 1: loader -->
+<section class="scene" id="loader">
+  <div class="wrap">
+    <h2>Birthday Wish Loading...</h2>
+    <div class="bar"><i id="barFill"></i></div>
+    <p id="loadPct" style="font-weight:700;font-size:1.4rem">0%</p>
+    <p id="loadMsg"></p>
+    <div class="row"><button id="forceBtn" class="pink" style="display:none">99% pe atka hai, force finish karo 🔨</button></div>
+  </div>
+</section>
+
+<!-- 2: quiz -->
+<section class="scene" id="quiz">
+  <div class="wrap card">
+    <span class="qtag" id="qTag">Question 1/3</span>
+    <h2 id="qText" style="font-size:1.5rem;margin-top:.5em"></h2>
+    <div class="opts" id="qOpts"></div>
+    <div class="react" id="qReact"></div>
+    <div class="row"><button id="qNext" style="display:none">Agla sawaal ➜</button></div>
+  </div>
+</section>
+
+<!-- 3: runaway -->
+<section class="scene" id="hug">
+  <div class="wrap">
+    <div class="big">🥺</div>
+    <h2>Ek serious sawaal...</h2>
+    <p>Kya main tumhe aaj <b>ek bada wala hug</b> de sakta hu?</p>
+    <div class="arena" id="arena">
+      <button id="yes" class="pink">Haan 🤗</button>
+      <button id="no" class="ghost">Nahi</button>
+    </div>
+    <p class="sub" id="hugHint">(Soch samajh ke jawab dena, "Nahi" thoda sharmila hai)</p>
+  </div>
+</section>
+
+<!-- 4: cake -->
+<section class="scene" id="cakeScene">
+  <div class="wrap">
+    <h2>Cake time! 🎂</h2>
+    <p class="sub">Pehle dil mein ek wish maango, phir flames pe tap karo.<br>Ya fir <b>phook maaro</b> (mic permission maangega, khaa nahi jaayega 😜)</p>
+    <div class="cake" id="cake">
+      <div class="candles" id="candles"></div>
+      <div class="tier t3"><div class="drip"></div></div>
+      <div class="tier t2"><div class="drip"></div></div>
+      <div class="tier t1"><div class="drip"></div></div>
+      <div class="plate"></div>
+    </div>
+    <p id="cakeMsg" class="react">Abhi 0 / 5 candles bujhi hain</p>
+    <div class="row">
+      <button id="blowBtn" class="ghost">🎤 Phook maaro</button>
+      <button id="cakeNext" style="display:none">Wish ho gayi ✨</button>
+    </div>
+  </div>
+</section>
+
+<!-- 5: reasons -->
+<section class="scene" id="reasons">
+  <div class="wrap">
+    <h2>Tumhe kyun jhelta hu 😌</h2>
+    <p class="sub">Saare cards palto. (Ek bhi chhoda toh aage nahi jaane dunga!)</p>
+    <div class="grid" id="grid"></div>
+    <p id="reasonCount" class="react">0 / 6 khule</p>
+    <div class="row"><button id="reasonNext" disabled>Aage chalo ➜</button></div>
+  </div>
+</section>
+
+<!-- 6: coupons -->
+<section class="scene" id="coupons">
+  <div class="wrap">
+    <h2>Birthday Coupons 🎟️</h2>
+    <p class="sub">Aaj ke din ke liye valid. Tap karke redeem karo, no questions asked (sirf thodi shikayat allowed).</p>
+    <div id="couponList"></div>
+    <div class="row"><button id="couponNext">Aakhri baat ➜</button></div>
+  </div>
+</section>
+
+<!-- 7: letter -->
+<section class="scene" id="letterScene">
+  <div class="wrap">
+    <h2>Tumhare naam ek chitthi 💌</h2>
+    <div class="card letter caret" id="letter"></div>
+    <div class="row"><button id="skipType" class="ghost">Skip ⏩</button><button id="surprise" class="pink" style="display:none">🎆 Last Surprise!</button></div>
+  </div>
+</section>
+
+<!-- 8: finale -->
+<section class="scene" id="finale">
+  <div class="wrap">
+    <div class="big">🥳</div>
+    <h1>Happy Birthday<br><span class="nm"></span>!</h1>
+    <p>Tum sabse best ho, bas mujhse thodi kam 😎<br><span class="sub">(mazaak! tum hi best ho ❤️)</span></p>
+    <p class="sub" style="margin-top:18px">Kahin bhi tap karo, aatishbazi hogi 🎆</p>
+    <div class="row"><button id="replay" class="ghost">🔁 Phir se dekho</button></div>
+  </div>
+</section>
+
+<div id="dots"></div>
+
+<script>
+/* ============ ✏️ APNA NAAM YAHAN BADLO ============ */
+const CONFIG = {
+  name: "Jaanu",          // birthday wali ka naam / pyaar ka naam
+  from: "Tumhara Pagal",  // letter ke end mein tumhara naam
+};
+/* Link se bhi badal sakte ho:  index.html?name=Priya&from=Rahul */
+const q = new URLSearchParams(location.search);
+if (q.get("name")) CONFIG.name = q.get("name").slice(0, 30);
+if (q.get("from")) CONFIG.from = q.get("from").slice(0, 30);
+document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
+document.title = `Happy Birthday ${CONFIG.name}! 🎂`;
+
+/* ============ helpers ============ */
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rnd = (a, b) => Math.random() * (b - a) + a;
+const scenes = ["gift","loader","quiz","hug","cakeScene","reasons","coupons","letterScene","finale"];
+let cur = 0;
+const dots = $("#dots");
+scenes.forEach(() => dots.appendChild(document.createElement("i")));
+function go(i){
+  cur = i;
+  document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
+  $("#" + scenes[i]).classList.add("active");
+  [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
+  $("#" + scenes[i]).scrollTop = 0;
+  if (scenes[i] === "loader") runLoader();
+  if (scenes[i] === "quiz") showQ();
+  if (scenes[i] === "letterScene") typeLetter();
+  if (scenes[i] === "finale") { burstFireworks(6); }
+}
+let toastT;
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* ============ floating hearts / balloons ============ */
+const floatEmojis = ["❤️","💖","🎈","✨","🎉","💕","🌸","🎂"];
+setInterval(() => {
+  if (document.hidden) return;
+  const f = document.createElement("div");
+  f.className = "floater";
+  f.textContent = floatEmojis[Math.floor(Math.random() * floatEmojis.length)];
+  f.style.left = rnd(0, 96) + "vw";
+  f.style.fontSize = rnd(18, 40) + "px";
+  const d = rnd(7, 13);
+  f.style.animationDuration = d + "s";
+  $("#floaters").appendChild(f);
+  setTimeout(() => f.remove(), d * 1000);
+}, 450);
+
+/* ============ confetti + fireworks (canvas) ============ */
+const cv = $("#fx"), ctx = cv.getContext("2d");
+let W, H, parts = [];
+function resize(){ const r = devicePixelRatio || 1; W = cv.width = innerWidth * r; H = cv.height = innerHeight * r; ctx.setTransform(r,0,0,r,0,0); }
+addEventListener("resize", resize); resize();
+const colors = ["#ff4d8d","#ffd166","#7bdff2","#b44bff","#06d6a0","#fff"];
+function confetti(n = 120, x = innerWidth/2, y = innerHeight/2){
+  for (let i = 0; i < n; i++){
+    const a = rnd(0, Math.PI*2), s = rnd(3, 11);
+    parts.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s - 5, g:.22, life:rnd(80,140), c:colors[i%colors.length], w:rnd(5,10), h:rnd(3,7), r:rnd(0,6), vr:rnd(-.3,.3), type:"c"});
+  }
+}
+function firework(x, y){
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  for (let i = 0; i < 70; i++){
+    const a = (i/70)*Math.PI*2, s = rnd(2, 6.5);
+    parts.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, g:.06, life:rnd(50,80), c, w:3, h:3, r:0, vr:0, type:"f"});
+  }
+}
+function burstFireworks(n){
+  for (let i = 0; i < n; i++) setTimeout(() => firework(rnd(.15,.85)*innerWidth, rnd(.12,.5)*innerHeight), i*350);
+}
+(function loop(){
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  parts = parts.filter(p => p.life > 0);
+  for (const p of parts){
+    p.x += p.vx; p.y += p.vy; p.vy += p.g; p.vx *= p.type==="f" ? .985 : .99; p.r += p.vr; p.life--;
+    ctx.globalAlpha = Math.min(1, p.life/30);
+    ctx.fillStyle = p.c;
+    if (p.type === "c"){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); }
+    else { ctx.beginPath(); ctx.arc(p.x,p.y,p.w/2,0,7); ctx.fill(); }
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(loop);
+})();
+addEventListener("pointerdown", e => {
+  if (scenes[cur] === "finale" && !e.target.closest("button")) { firework(e.clientX, e.clientY); }
+});
+
+/* ============ music (WebAudio, no files needed) ============ */
+let ac, musicOn = false, musicTimer, noteIdx = 0;
+const F = {C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99};
+// Happy Birthday: [note, beats]
+const tune = [["G4",.75],["G4",.25],["A4",1],["G4",1],["C5",1],["B4",2],
+              ["G4",.75],["G4",.25],["A4",1],["G4",1],["D5",1],["C5",2],
+              ["G4",.75],["G4",.25],["G5",1],["E5",1],["C5",1],["B4",1],["A4",1],
+              ["F5",.75],["F5",.25],["E5",1],["C5",1],["D5",1],["C5",2.5]];
+function playNote(freq, dur){
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+  o.type = "triangle"; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.18, t + .03);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur + .05);
+}
+function stepMusic(){
+  if (!musicOn) return;
+  const [n, b] = tune[noteIdx];
+  const dur = b * .42;
+  playNote(F[n], dur + .15);
+  noteIdx = (noteIdx + 1) % tune.length;
+  musicTimer = setTimeout(stepMusic, dur * 1000 + (noteIdx === 0 ? 1200 : 30));
+}
+function setMusic(on){
+  try {
+    if (on){ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); }
+    musicOn = on; clearTimeout(musicTimer);
+    if (on) stepMusic();
+    $("#music").textContent = on ? "🔊" : "🔇";
+  } catch (e) { $("#music").textContent = "🔇"; }
+}
+$("#music").onclick = () => setMusic(!musicOn);
+
+/* ============ 0: gift ============ */
+async function openGift(){
+  if ($("#gift").classList.contains("opening")) return;
+  $("#gift").classList.add("opening");
+  setMusic(true);            // user gesture => audio allowed
+  await sleep(550);
+  confetti(160);
+  $("#giftBox").textContent = "🎉";
+  await sleep(750);
+  $("#gift").classList.remove("opening");
+  go(1);
+}
+$("#openGift").onclick = openGift; $("#giftBox").onclick = openGift;
+
+/* ============ 1: loader ============ */
+const loadMsgs = [
+  "Cake dhoondh raha hu... (pehle khud na kha lu 🍰)",
+  "Tumhari asli age chhupa raha hu... (classified info 🤫)",
+  "Tumhare liye gift ke paise jama kar raha hu... 💸",
+  "Server pe load zyada hai, tum itni cute jo ho 😳",
+  "Balloons mein hawa bhar raha hu... fuuuu 🎈",
+  "Jhoothi tareefon ka stock check ho raha hai...",
+  "Almost done... bas thoda sa aur... (nahi hua)"
+];
+let loaderRunning = false;
+async function runLoader(){
+  if (loaderRunning) return; loaderRunning = true;
+  $("#forceBtn").style.display = "none";
+  const fill = $("#barFill"), pct = $("#loadPct"), msg = $("#loadMsg");
+  let p = 0, m = 0; msg.textContent = loadMsgs[0];
+  const t = setInterval(() => {
+    p = Math.min(99, p + rnd(3, 11)); fill.style.width = p + "%"; pct.textContent = Math.floor(p) + "%";
+    if (p >= 99) { clearInterval(t); }
+  }, 380);
+  const mt = setInterval(() => { m = Math.min(m + 1, loadMsgs.length - 1); msg.textContent = loadMsgs[m]; if (m === loadMsgs.length - 1) clearInterval(mt); }, 1500);
+  await sleep(7500);
+  $("#forceBtn").style.display = "inline-block";
+}
+$("#forceBtn").onclick = async () => {
+  $("#barFill").style.width = "100%"; $("#loadPct").textContent = "100%";
+  $("#loadMsg").textContent = "Force finish successful! 🔨✅ (Windows bhi aise hi chalta hai)";
+  confetti(100); await sleep(1300); loaderRunning = false; go(2);
+};
+
+/* ============ 2: quiz ============ */
+const quiz = [
+  { q: "Aaj ka din kiska hai?",
+    o: [["Meri maharani ka 👑","Sahi jawab! Full marks. Bhale hi ye sab options mein sahi tha 😌"],
+        ["Duniya ki sabse cute insaan ka","Itni sachchi baat? Tum toh genius ho!"],
+        ["Cake ka, tum toh side-role ho","Aww, cake ko bhi tumse jalan hoti hai 🎂😏"]] },
+  { q: "Birthday pe sabse zaroori cheez kya hai?",
+    o: [["Cake 🍰","Cake zaroori hai, par main usse zyada meetha hu 😎"],
+        ["Gift 🎁","Gift toh hai, par sabse bada gift main hu (return nahi hota)"],
+        ["Mera bf/gf/jaan ka message 🥰","Bilkul sahi! Isliye ye poori website bana di 🙈"]] },
+  { q: "Tumhari age is saal kitni ho gayi?",
+    o: [["18 (forever)","Haan haan, 18 ka 'Part 7' chal raha hai 😂"],
+        ["Ladkiyon se age nahi poochte!","Correct! Mujhe bhi jaan pyaari hai 🏃"],
+        ["Loading... 99%","Wahi atka hua loader! Great minds think alike 🧠"]] },
+];
+let qi = 0;
+function showQ(){
+  const d = quiz[qi];
+  $("#qTag").textContent = `Question ${qi+1}/${quiz.length}`;
+  $("#qText").textContent = d.q;
+  $("#qReact").textContent = "";
+  $("#qNext").style.display = "none";
+  $("#qNext").textContent = qi === quiz.length - 1 ? "Aage badho ➜" : "Agla sawaal ➜";
+  const box = $("#qOpts"); box.innerHTML = "";
+  d.o.forEach(([label, reply]) => {
+    const b = document.createElement("button");
+    b.className = "opt"; b.textContent = label;
+    b.onclick = () => {
+      [...box.children].forEach(x => x.disabled = true);
+      b.style.background = "linear-gradient(135deg,#ff7aa8,#b44bff)";
+      $("#qReact").textContent = reply;
+      confetti(40, b.getBoundingClientRect().left + 40, b.getBoundingClientRect().top);
+      $("#qNext").style.display = "inline-block";
+    };
+    box.appendChild(b);
+  });
+}
+$("#qNext").onclick = () => { if (qi < quiz.length - 1) { qi++; showQ(); } else { qi = 0; go(3); } };
+
+/* ============ 3: runaway "No" ============ */
+const noLines = ["Nahi", "Pakka?", "Soch lo ek baar", "Sharam karo 🥺", "Main ro dunga", "Mummy ko bolunga", "Last warning!", "Arre pakdo mat 😭", "Haath dukh jayega"];
+let dodges = 0;
+function dodge(e){
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  dodges++;
+  const a = $("#arena"), no = $("#no"), yes = $("#yes");
+  const maxL = a.clientWidth - no.offsetWidth, maxT = a.clientHeight - no.offsetHeight;
+  no.style.left = rnd(0, maxL) + "px"; no.style.top = rnd(70, maxT) + "px";
+  no.textContent = noLines[Math.min(dodges, noLines.length - 1)];
+  const s = Math.min(1 + dodges * .16, 1.9);
+  yes.style.transform = `translateX(-50%) scale(${s})`;
+  if (dodges === 3) toast("Bhaag raha hai 'Nahi' button 😂");
+  if (dodges === 6) $("#hugHint").textContent = "Haar maan lo, 'Haan' bada hota ja raha hai 😏";
+}
+["pointerenter","pointerdown","click","touchstart"].forEach(ev => $("#no").addEventListener(ev, dodge, {passive:false}));
+$("#yes").onclick = async () => {
+  confetti(140); toast("Pata tha! 😌🤗 (virtual hug sent)");
+  $("#yes").textContent = "🤗 Aajao!"; await sleep(1500); dodges = 0; go(4);
+};
+
+/* ============ 4: cake ============ */
+let blown = 0; const NC = 5;
+const cd = $("#candles");
+for (let i = 0; i < NC; i++){
+  const c = document.createElement("div"); c.className = "candle"; c.innerHTML = '<div class="flame"></div>';
+  c.onclick = () => blow(c); cd.appendChild(c);
+}
+const cakeLines = ["Abhi 0 / 5 candles bujhi hain", "1 gayi! Aur zor lagao 💪", "2 ho gayi, aadha kaam baaki 😅", "3! Wish soch lo ab 🤞", "4... bas ek aur! 🔥"];
+function blow(c){
+  if (c.classList.contains("out")) return;
+  c.classList.add("out"); blown++;
+  if (blown < NC) { $("#cakeMsg").textContent = cakeLines[blown]; return; }
+  $("#cakeMsg").textContent = "Wish pakki! 🎉 Par kisi ko batana mat, warna poori nahi hogi (mujhe chhodke 😜)";
+  confetti(220); setTimeout(() => confetti(120), 400);
+  $("#blowBtn").style.display = "none"; $("#cakeNext").style.display = "inline-block";
+}
+$("#blowBtn").onclick = async () => {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({audio:true});
+    const mc = new (window.AudioContext || window.webkitAudioContext)();
+    const an = mc.createAnalyser(); an.fftSize = 512;
+    mc.createMediaStreamSource(s).connect(an);
+    const buf = new Uint8Array(an.fftSize);
+    toast("Ab zor se phooonk maaro! 🌬️");
+    let hot = 0;
+    const iv = setInterval(() => {
+      an.getByteTimeDomainData(buf);
+      let peak = 0; for (const v of buf) peak = Math.max(peak, Math.abs(v - 128));
+      if (peak > 55) hot++; else hot = Math.max(0, hot - 1);
+      if (hot >= 3) {
+        clearInterval(iv); s.getTracks().forEach(t => t.stop()); mc.close();
+        [...cd.children].forEach((c, i) => setTimeout(() => blow(c), i * 160));
+      }
+    }, 80);
+    setTimeout(() => { clearInterval(iv); s.getTracks().forEach(t => t.stop()); }, 15000);
+  } catch (e) { toast("Mic nahi mila 😅 Flames pe tap karo!"); }
+};
+$("#cakeNext").onclick = () => go(5);
+
+/* ============ 5: reasons ============ */
+const reasons = [
+  "Tumhari smile meri battery 1% se seedha 100% kar deti hai 🔋",
+  "Tum mere lame memes pe bhi hasti ho. Isliye tum best ho 😂",
+  "Khaana share nahi karti, par pyaar poora karti ho 🍟❤️",
+  "Tumhara 'bas 5 min' = 2 ghante. Phir bhi main wait karta hu ⏰",
+  "Gusse mein bhi cute lagti ho (par bolna mat, aur gussa hoogi 🙈)",
+  "Bas tum ho, isliye sab kuch achha lagta hai ✨"
+];
+let flipped = 0;
+reasons.forEach((r, i) => {
+  const d = document.createElement("div"); d.className = "flip";
+  d.innerHTML = `<div class="in"><div class="face front"><b>${i+1}</b>Reason #${i+1}</div><div class="face back">${r}</div></div>`;
+  d.onclick = () => {
+    if (d.classList.contains("on")) return;
+    d.classList.add("on"); flipped++;
+    $("#reasonCount").textContent = flipped < reasons.length ? `${flipped} / ${reasons.length} khule` : "Saare khul gaye! Ab bolo, jhelna aasan hai? 😏";
+    if (flipped === reasons.length) { $("#reasonNext").disabled = false; confetti(100); }
+  };
+  $("#grid").appendChild(d);
+});
+$("#reasonNext").onclick = () => go(6);
+
+/* ============ 6: coupons ============ */
+const coupons = [
+  ["🤗","1 Free Mega Hug","Expiry: kabhi nahi"],
+  ["🍕","1 Treat (tumhari pasand)","Paise: mere. Khaana: zyada tumhara"],
+  ["🙄","1 'Tum bilkul sahi ho' pass","Jab bhi lado, ye chalega"],
+  ["📸","10 photos bina nakhre ke","Main photographer, tum model"],
+  ["🛑","Mujhe daantne ka 1 pass","Reason: koi bhi. Defense: zero"]
+];
+coupons.forEach(([e, t, s]) => {
+  const c = document.createElement("div"); c.className = "coupon";
+  c.innerHTML = `<span class="e">${e}</span><div><b>${t}</b><small>${s}</small></div>`;
+  c.onclick = () => { c.classList.add("used"); confetti(50, c.getBoundingClientRect().left + 40, c.getBoundingClientRect().top); toast("Redeemed! No refunds 😎"); };
+  $("#couponList").appendChild(c);
+});
+$("#couponNext").onclick = () => go(7);
+
+/* ============ 7: letter ============ */
+const letterText =
+`Dear ${CONFIG.name},
+
+Aaj tumhara birthday hai, aur main soch raha tha kya likhu... phir socha, Google karta hu. Google ne bola "Isse behtar insaan nahi milega", toh seedha dil se likh raha hu. 😌
+
+Tum meri zindagi ki wo WiFi ho jiske bina main chal hi nahi sakta. Kabhi slow, kabhi gussa, par signal hamesha dil pe full. 📶❤️
+
+Tumhare saath hasna bhi mazedaar hai aur ladna bhi (kyunki end mein jeet tumhari hi hoti hai, aur mujhe ye pata hai).
+
+Is saal ki bas itni dua hai: tumhari smile kabhi low battery na ho, tumhare sapne kabhi buffer na karein, aur main hamesha tumhare saath rahu, chahe tum "bas 5 min" bol ke 2 ghante laga do.
+
+Happy Birthday, meri jaan. Aaj tum sirf hukum chalao, main sirf "ji, madam" bolunga. 🫡
+
+Always yours,
+${CONFIG.from} 💕`;
+let typing = false, typeAbort = false;
+async function typeLetter(){
+  if (typing) return; typing = true; typeAbort = false;
+  const el = $("#letter"); el.textContent = ""; el.classList.add("caret");
+  $("#surprise").style.display = "none"; $("#skipType").style.display = "inline-block";
+  const chars = [...letterText];
+  for (let i = 0; i < chars.length && !typeAbort; i++){
+    el.textContent += chars[i]; el.scrollTop = el.scrollHeight;
+    await sleep(chars[i] === "\n" ? 140 : 24);
+  }
+  el.textContent = letterText; el.classList.remove("caret");
+  $("#skipType").style.display = "none"; $("#surprise").style.display = "inline-block";
+  typing = false;
+}
+$("#skipType").onclick = () => { typeAbort = true; };
+$("#surprise").onclick = () => { confetti(200); go(8); };
+
+/* ============ 8: finale ============ */
+$("#replay").onclick = () => { blown = 0; flipped = 0; location.href = location.pathname + location.search; };
+
+go(0);
+</script>
+</body>
+</html>
