@@ -328,7 +328,7 @@ gnext.addEventListener("click", async () => {
   gnext.classList.remove("show");
   const g = $("#garden"), a = g.animate([{opacity: 1}, {opacity: 0}], {duration: 900, fill: "forwards"});
   await a.finished; g.style.display = "none"; a.cancel();
-  $("#hello").classList.add("on"); chord([523.25, 659.25, 783.99], .045);
+  $("#hello").classList.add("on"); helloOpen = true; playHero(); chord([523.25, 659.25, 783.99], .045);
 });
 
 /* ---------- a few quiet flowers in the margins ---------- */
@@ -372,21 +372,28 @@ function mountGif(i = 0){
   img.onerror = () => mountGif(i + 1);
   img.src = gifSources[i];
 }
+let heroVideo = null, helloOpen = false;
+/* sound starts when the hello scene opens (the garden tap counts as the user gesture);
+   if a browser still blocks it, start muted and unmute on the first tap */
+function playHero(){
+  const v = heroVideo; if (!v) return;
+  v.muted = false; v.currentTime = 0;
+  v.play().catch(() => {
+    v.muted = true; v.play().catch(() => {});
+    addEventListener("pointerdown", () => { v.muted = false; }, {once: true});
+  });
+}
 function mountVideo(){
   if (!CONFIG.video) return mountGif();
   const v = document.createElement("video");
-  v.loop = true; v.autoplay = true; v.playsInline = true; v.preload = "auto";
+  v.loop = true; v.playsInline = true; v.preload = "auto";
   v.setAttribute("playsinline", ""); v.setAttribute("aria-label", "A short flying-kiss clip");
   if (CONFIG.videoPoster) v.poster = CONFIG.videoPoster;
   let shown = false;
   v.addEventListener("canplay", () => {
     if (shown) return; shown = true;
     const box = $("#dancer"); box.className = "dancer clip"; box.replaceChildren(v);
-    // always with sound; if the browser blocks it, start muted and unmute on the first tap
-    v.play().catch(() => {
-      v.muted = true; v.play().catch(() => {});
-      addEventListener("pointerdown", () => { v.muted = false; v.play().catch(() => {}); }, {once: true});
-    });
+    heroVideo = v; if (helloOpen) playHero();
   });
   v.addEventListener("error", () => { if (!shown) mountGif(); });
   v.src = CONFIG.video;
