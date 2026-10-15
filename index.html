@@ -174,6 +174,45 @@
   #why.on ~ #miniPlay{display:grid}
 
   /* =========================================================
+     Last screen: the hanging lantern (pull the string)
+     ========================================================= */
+  #lantern{position:fixed;inset:0;z-index:75;display:none;overflow-x:hidden;overflow-y:auto;text-align:center;color:var(--ink);background:var(--page);
+    padding:0 20px max(118px,calc(98px + env(safe-area-inset-bottom)))}
+  #lantern.on{display:block;animation:fadeIn .9s ease both}
+  .lt-back{position:absolute;left:14px;top:max(14px,env(safe-area-inset-top));z-index:3}
+  .lt-stage{position:relative;display:flex;flex-direction:column;align-items:center;min-height:100%}
+  .lt-svgwrap{position:relative;display:flex;justify-content:center;width:100%}
+  #lanternSvg{position:relative;z-index:1;display:block;height:min(50vh,430px);width:auto;overflow:visible;transition:filter 1s}
+  #lantern.lit #lanternSvg{filter:drop-shadow(0 0 26px rgba(255,170,190,.85))}
+  .lt-swing{transform-origin:100px 10px;animation:ltSwing 5s ease-in-out infinite}
+  .lt-swing.kick{animation:ltKick 1.6s ease-out}
+  @keyframes ltSwing{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(2.6deg)}}
+  @keyframes ltKick{0%{transform:rotate(9deg)}22%{transform:rotate(-7deg)}46%{transform:rotate(5deg)}70%{transform:rotate(-2.6deg)}100%{transform:rotate(2.6deg)}}
+  .lt-glow{position:absolute;left:50%;top:36%;width:min(120vw,620px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(.3);opacity:0;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,206,218,.95) 0%,rgba(255,224,206,.5) 38%,rgba(255,224,206,0) 68%);transition:opacity 1s,transform 1.2s var(--ease)}
+  #lantern.lit .lt-glow{opacity:1;transform:translate(-50%,-50%) scale(1);animation:ltPulse 3.2s 1.2s ease-in-out infinite}
+  @keyframes ltPulse{50%{transform:translate(-50%,-50%) scale(1.07);opacity:.85}}
+  .ball-warm,.e-lit,.m-lit{opacity:0;transition:opacity .7s}
+  #lantern.lit .ball-warm,#lantern.lit .e-lit,#lantern.lit .m-lit{opacity:1}
+  .e-idle,.m-idle{transition:opacity .5s}
+  #lantern.lit .e-idle,#lantern.lit .m-idle{opacity:0}
+  #pullHandle{cursor:grab;touch-action:none}
+  #pullHandle:active{cursor:grabbing}
+  #chain{transform-box:fill-box}
+  .lt-text{position:relative;z-index:2;width:min(100%,460px);margin-top:6px}
+  .lt-hint,.lt-final{transition:opacity .9s,transform .9s var(--ease)}
+  .lt-hint{font:400 clamp(1.8rem,7vw,2.4rem)/1.1 'Great Vibes',cursive;color:var(--rose)}
+  .lt-hint small{display:block;margin-top:6px;font:600 .64rem Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+  .lt-final{position:absolute;left:0;right:0;top:0;opacity:0;transform:translateY(14px);pointer-events:none}
+  #lantern.lit .lt-hint{opacity:0;transform:translateY(-10px)}
+  #lantern.lit .lt-final{opacity:1;transform:none;pointer-events:auto}
+  .lt-final .ey{font:600 .64rem Inter,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+  .lt-final h2{margin:8px 0 0;font:600 clamp(1.8rem,7.6vw,2.5rem)/1.1 'Playfair Display',Georgia,serif;letter-spacing:-.01em}
+  .lt-final .nm2{display:block;margin-top:2px;font:400 clamp(2rem,9vw,2.9rem)/1.05 'Great Vibes',cursive;color:var(--rose)}
+  .lt-final p{margin:12px auto 0;max-width:34ch;font:italic 400 1rem/1.7 'Playfair Display',Georgia,serif;color:var(--ink-soft)}
+  #lantern.on ~ #miniPlay{display:grid}
+
+  /* =========================================================
      Scrapbook / album: gingham, notebook spread, polaroid, film strip
      ========================================================= */
   #book{position:fixed;inset:0;z-index:60;display:none;overflow-x:hidden;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px max(124px,calc(104px + env(safe-area-inset-bottom)));color:var(--ink);
@@ -261,7 +300,7 @@
   @media (prefers-reduced-motion:reduce){
     .ff,.dancer,.armL,.armR,.tail,#envelope,.eshadow,.hint i{animation:none!important}
     .flapF,.flapB,.lt{transition-duration:.01ms!important;transition-delay:0s!important}
-    .avatar,.cover.spin,.drop,.stk.wob,.pet,#go.show,#go .arr{animation:none!important}
+    .avatar,.cover.spin,.drop,.stk.wob,.pet,#go.show,#go .arr,.lt-swing,.lt-swing.kick,#lantern.lit .lt-glow{animation:none!important}
     .wc .in{transition-duration:.01ms!important}
   }
 </style>
@@ -358,6 +397,45 @@
     <div class="wgrid" id="wgrid"></div>
     <div class="wcount" id="wcount" aria-live="polite"></div>
     <div class="wnav"><button class="btn-ghost" id="whyBack" type="button">&larr; Back</button></div>
+  </div>
+</section>
+
+<section id="lantern" aria-label="One last surprise">
+  <button class="btn-ghost lt-back" id="lnBack" type="button">&larr; Back</button>
+  <div class="lt-stage">
+    <div class="lt-svgwrap">
+      <div class="lt-glow" id="ltGlow" aria-hidden="true"></div>
+      <svg id="lanternSvg" viewBox="0 0 200 420" role="img" aria-label="A smiling pink paper lantern hanging from the ceiling with a pull chain">
+        <defs>
+          <radialGradient id="ballG" cx="36%" cy="30%" r="80%"><stop offset="0" stop-color="#fff3f6"/><stop offset=".45" stop-color="#f9cddb"/><stop offset="1" stop-color="#ec9fb6"/></radialGradient>
+          <radialGradient id="warmG" cx="50%" cy="46%" r="62%"><stop offset="0" stop-color="#fffbe9"/><stop offset=".5" stop-color="#ffe3d6"/><stop offset="1" stop-color="#ffb9cb"/></radialGradient>
+          <linearGradient id="capG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b48f9d"/><stop offset=".5" stop-color="#dcc3cc"/><stop offset="1" stop-color="#b48f9d"/></linearGradient>
+        </defs>
+        <rect x="64" y="0" width="72" height="10" rx="4" fill="url(#capG)"/>
+        <g class="lt-swing" id="ltSwing">
+          <rect x="97" y="10" width="6" height="58" fill="#c9b0ba"/>
+          <rect x="80" y="66" width="40" height="13" rx="4" fill="url(#capG)"/>
+          <circle cx="100" cy="150" r="72" fill="url(#ballG)"/>
+          <circle class="ball-warm" cx="100" cy="150" r="72" fill="url(#warmG)"/>
+          <g fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.4"><ellipse cx="100" cy="150" rx="26" ry="72"/><ellipse cx="100" cy="150" rx="52" ry="72"/><path d="M30 130q70 14 140 0M30 172q70 -14 140 0" opacity=".6"/></g>
+          <rect x="80" y="218" width="40" height="13" rx="4" fill="url(#capG)"/>
+          <ellipse cx="68" cy="164" rx="10" ry="6.5" fill="#f089a6" opacity=".45"/><ellipse cx="132" cy="164" rx="10" ry="6.5" fill="#f089a6" opacity=".45"/>
+          <g class="e-idle" fill="#5a3a4a"><circle cx="80" cy="146" r="5"/><circle cx="120" cy="146" r="5"/></g>
+          <g class="e-lit" fill="none" stroke="#5a3a4a" stroke-width="3.4" stroke-linecap="round"><path d="M72 150q8 -11 16 0"/><path d="M112 150q8 -11 16 0"/></g>
+          <path class="m-idle" d="M88 166q12 11 24 0" fill="none" stroke="#5a3a4a" stroke-width="3.2" stroke-linecap="round"/>
+          <path class="m-lit" d="M86 164q14 20 28 0z" fill="#d9708f" stroke="#5a3a4a" stroke-width="3" stroke-linejoin="round"/>
+          <g id="chain">
+            <line x1="100" y1="231" x2="100" y2="338" stroke="#cdb4bd" stroke-width="1.2"/>
+            <g fill="#b99aa7" id="beads"></g>
+            <g id="pullHandle" role="button" tabindex="0" aria-label="Pull the chain"><circle cx="100" cy="346" r="22" fill="transparent"/><circle cx="100" cy="346" r="8.5" fill="#a9808f"/><circle cx="97.5" cy="343.5" r="2.6" fill="rgba(255,255,255,.55)"/></g>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="lt-text">
+      <div class="lt-hint" id="ltHint"><span id="ltHintText"></span><small>tap or drag the chain down</small></div>
+      <div class="lt-final" id="ltFinal"><div class="ey">one last thing</div><h2>Happy Birthday</h2><span class="nm2 nm"></span><p id="finalNote"></p></div>
+    </div>
   </div>
 </section>
 
@@ -556,6 +634,9 @@ const CONFIG = {
     "Tum jaise bas ek hi ho. Koi copy nahi",
     "Aur sabse badi wajah: bas tum ho, {name}"
   ],
+  // Last screen (lantern)
+  lanternHint: "Pull the string",
+  finalNote: "Tum jahan bhi jao, apni roshni saath le jaana. Meri taraf se bahut saara pyaar, aur ek bada sa Happy Birthday.",
   // Album / scrapbook page
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
   photoLabel: "Favorite person",    // little tag on the polaroid
@@ -803,8 +884,55 @@ document.addEventListener("pointermove", e => {
   if (!trailRAF) trailRAF = requestAnimationFrame(trailLoop);
 });
 document.documentElement.addEventListener("mouseleave", () => trailEl.classList.remove("live"));
-function openWhy(){ if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); setGo("Replay", () => location.reload(), 800, "\u21BB"); }   // last screen of the flow
+function openWhy(){ if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); setGo("One last thing", openLantern, 800); }
 $("#whyBack").addEventListener("click", () => { $("#why").classList.remove("on"); updateBookGo(); });
+
+/* ---------- last screen: the lantern ---------- */
+const svgHeart = c => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z" fill="${c}"/></svg>`;
+const svgLeaf = c => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2c5 4 7 9 0 20C5 11 7 6 12 2z" fill="${c}"/></svg>`;
+function petalRain(n = 56){
+  if (reduceMotion) n = 12;
+  const cols = ["#d9708f", "#e8b2c2", "#f0cdb0", "#cdbfe6", "#fff1f4", "#e8909f"];
+  for (let i = 0; i < n; i++){
+    const d = document.createElement("div"), sz = rnd(10, 24);
+    d.style.cssText = `position:fixed;left:${rnd(0, 100)}vw;top:-30px;width:${sz}px;height:${sz}px;z-index:78;pointer-events:none`;
+    d.innerHTML = Math.random() > .5 ? svgHeart(pick(cols)) : svgLeaf(pick(cols));
+    document.body.appendChild(d);
+    d.animate([{transform: "translate(0,0) rotate(0deg)", opacity: 1}, {transform: `translate(${rnd(-120, 120)}px,${innerHeight + 60}px) rotate(${rnd(-540, 540)}deg)`, opacity: .9}],
+      {duration: rnd(3500, 7000), delay: rnd(0, 2200), easing: "cubic-bezier(.3,.1,.5,1)", fill: "backwards"}).finished.then(() => d.remove());
+  }
+}
+$("#ltHintText").textContent = CONFIG.lanternHint;
+$("#finalNote").textContent = fill(CONFIG.finalNote);
+{ const beads = $("#beads"); for (let y = 238; y < 336; y += 8){ const c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("cx", 100); c.setAttribute("cy", y); c.setAttribute("r", 2.4); beads.appendChild(c); } }
+let lit = false;
+function openLantern(){
+  $("#lantern").scrollTop = 0; $("#lantern").classList.add("on");
+  if (lit) setGo("Replay", () => location.reload(), 600, "↻"); else setGo(CONFIG.lanternHint, pullLantern, 900, "↓");
+}
+function pullLantern(){
+  if (lit) return; lit = true;
+  const sw = $("#ltSwing"); sw.classList.remove("kick"); void sw.getBoundingClientRect(); sw.classList.add("kick"); sw.addEventListener("animationend", () => sw.classList.remove("kick"), {once: true});
+  $("#lantern").classList.add("lit");
+  blip(1500, .05, .08); setTimeout(() => blip(900, .08, .06), 70); setTimeout(() => chord([523.25, 659.25, 783.99, 1046.5], .07), 350);
+  const r = $("#lanternSvg").getBoundingClientRect(); heartBurst(r.left + r.width / 2, r.top + r.height * .36, 18);
+  setTimeout(() => petalRain(), 500); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .35, 20), 1400);
+  setGo("Replay", () => location.reload(), 3200, "↻");
+}
+/* the chain: tap it, or drag it down and let go */
+{
+  const handle = $("#pullHandle"), chain = $("#chain"); let y0 = null, dy = 0;
+  handle.addEventListener("pointerdown", e => { e.preventDefault(); handle.setPointerCapture(e.pointerId); y0 = e.clientY; dy = 0; chain.style.transition = ""; });
+  handle.addEventListener("pointermove", e => { if (y0 === null) return; dy = Math.max(0, Math.min(46, (e.clientY - y0) * .5)); chain.style.transform = `translateY(${dy}px)`; });
+  const end = () => {
+    if (y0 === null) return; const moved = dy; y0 = null;
+    chain.style.transition = "transform .5s cubic-bezier(.3,1.7,.5,1)"; chain.style.transform = ""; setTimeout(() => chain.style.transition = "", 560);
+    if (moved > 12 || moved < 2) pullLantern();
+  };
+  handle.addEventListener("pointerup", end); handle.addEventListener("pointercancel", end);
+  handle.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pullLantern(); } });
+}
+$("#lnBack").addEventListener("click", () => { $("#lantern").classList.remove("on"); setGo("One last thing", openLantern, 400); });
 
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {
