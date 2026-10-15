@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#07080d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400;1,500&family=Space+Grotesk:wght@500;700&family=Great+Vibes&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400;1,500&family=Space+Grotesk:wght@500;700&family=Great+Vibes&family=Caveat:wght@500;600&family=Fredoka:wght@600&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#07080d}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -133,19 +133,76 @@
   .cta{display:inline-block;margin-top:20px;font:600 .68rem Inter,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#fff;background:linear-gradient(180deg,#e07a96,#c4627f);border:0;border-radius:999px;padding:14px 26px;cursor:pointer;box-shadow:0 12px 26px rgba(196,98,127,.38);transition:transform .15s}
   .cta:active{transform:scale(.97)}
   .cta[hidden]{display:none}
-  #album{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;background:rgba(35,42,58,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  #album.on{display:flex;animation:fadeIn .5s ease both}
-  .polaroid{background:#fff;padding:12px 12px 18px;border-radius:4px;box-shadow:0 24px 50px rgba(0,0,0,.4);width:min(80vw,320px);transform:rotate(-2deg)}
-  .polaroid img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#f3dde6}
-  .polaroid p{font:600 1.3rem Caveat,cursive;color:var(--ink);margin:10px 0 0;text-align:center;min-height:1.4em}
-  #album .row{display:flex;gap:10px;margin-top:22px}
-  #album .btn-ghost{color:#fff;border-color:rgba(255,255,255,.5);margin:0}
-  #album .btn-ghost:hover{background:#fff;color:var(--ink)}
+  /* =========================================================
+     Scrapbook / album: gingham, notebook spread, polaroid, film strip
+     ========================================================= */
+  #book{position:fixed;inset:0;z-index:60;display:none;overflow-x:hidden;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 96px;color:#3d466b;
+    --g1:#fff7fa;--g2:rgba(232,140,170,.36);background-color:var(--g1);
+    background-image:repeating-linear-gradient(0deg,var(--g2) 0 34px,transparent 34px 68px),repeating-linear-gradient(90deg,var(--g2) 0 34px,transparent 34px 68px)}
+  body[data-gingham="blue"] #book{--g1:#f5f9ff;--g2:rgba(124,166,224,.38)}
+  #book::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 42%,transparent 48%,rgba(110,55,85,.2) 100%)}
+  #book.on{display:block;animation:fadeIn .9s ease both}
+  .bk{position:relative;width:min(100%,900px);margin:0 auto}
+  .bk-top{display:flex;align-items:center;justify-content:space-between;margin:6px 0 16px}
+  .bk-back{font:600 .66rem Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#7b4a5d;background:rgba(255,255,255,.8);border:1px solid rgba(196,98,127,.3);border-radius:999px;padding:10px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(110,55,85,.12)}
+  .bk-back:focus-visible,#miniPlay:focus-visible,#bkPol:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+  .bk-title{font:600 1.5rem Caveat,cursive;color:#8a4a62}
+
+  .notebook{position:relative;display:grid;grid-template-columns:1fr;border-radius:12px;padding:10px;background:#d8c9ad;box-shadow:0 34px 60px rgba(100,55,80,.32),0 6px 14px rgba(100,55,80,.2)}
+  .pg{position:relative;min-height:320px;padding:30px 26px 30px;background:linear-gradient(180deg,#fcf6ea,#f4ebd8);overflow:hidden}
+  .pgL{border-radius:6px 6px 0 0;background-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(150,160,200,.16) 31px 32px),linear-gradient(180deg,#fcf6ea,#f4ebd8)}
+  .pgR{border-radius:0 0 6px 6px}
+  .spine{position:relative;height:24px;display:flex;justify-content:space-around;align-items:center;background:linear-gradient(180deg,#e7d9bd,#eadfc6,#e7d9bd);z-index:2}
+  .spine i{width:46px;height:13px;border-radius:8px;background:linear-gradient(180deg,#fafafa,#aab0b8 60%,#7f858e);box-shadow:0 3px 4px rgba(0,0,0,.35),inset 0 -2px 2px rgba(0,0,0,.18);transform:translateY(0)}
+  @media (min-width:760px){
+    .notebook{grid-template-columns:1fr 30px 1fr}
+    .pgL{border-radius:6px 0 0 6px}.pgR{border-radius:0 6px 6px 0}
+    .pg{min-height:420px;padding:38px 34px}
+    .spine{height:auto;flex-direction:column;padding:26px 0}
+    .spine i{width:48px;height:13px}
+  }
+  .agewrap{display:flex;align-items:flex-end;gap:6px}
+  .age{font:600 clamp(4.6rem,19vw,7.4rem)/.9 Fredoka,'Trebuchet MS',sans-serif;color:#f07fa6;text-shadow:0 3px 0 rgba(255,255,255,.7),0 6px 10px rgba(200,90,130,.25);letter-spacing:-.02em}
+  .cup{width:68px;height:68px;margin-bottom:6px;cursor:pointer}
+  .hwm{font:600 clamp(1.25rem,4.6vw,1.45rem)/1.55 Caveat,cursive;color:#3d4a7c;margin:20px 0 0;white-space:pre-line}
+  .stk{filter:drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff) drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff) drop-shadow(0 4px 5px rgba(60,30,50,.25));transition:transform .3s}
+  .stk.wob{animation:wob .6s ease}
+  @keyframes wob{25%{transform:rotate(-14deg) scale(1.08)}60%{transform:rotate(10deg) scale(1.08)}}
+  .tape{position:absolute;left:8%;top:18px;width:30px;height:190px;background:repeating-linear-gradient(135deg,#fbe06a 0 9px,#f7d24a 9px 18px);opacity:.9;transform:rotate(-3deg);box-shadow:0 2px 4px rgba(0,0,0,.12)}
+  .pol{position:relative;z-index:1;margin:6px auto 0;width:min(74%,260px);padding:11px 11px 34px;background:#fff;box-shadow:0 14px 26px rgba(80,45,65,.28);transform:rotate(3deg);cursor:pointer;transition:transform .35s}
+  .pol:hover{transform:rotate(1.2deg) scale(1.02)}
+  .pol.swap{animation:swap .55s ease}
+  @keyframes swap{40%{transform:rotate(-6deg) scale(.94);opacity:.4}}
+  .phwrap{aspect-ratio:1/1;background:#eadfe4;overflow:hidden}
+  .phwrap img{display:block;width:100%;height:100%;object-fit:cover}
+  .ph{display:grid;place-content:center;justify-items:center;gap:4px;width:100%;height:100%;background:linear-gradient(135deg,#ffe3ec,#ffd9c7);color:#c98298;font:600 1.05rem Caveat,cursive}
+  .ph svg{width:34px;height:34px}
+  .pol figcaption{position:absolute;left:0;right:0;bottom:6px;text-align:center;font:600 1.1rem Caveat,cursive;color:#5b6490;min-height:1.2em}
+  .flower{position:absolute;left:11%;top:6px;width:46px;height:46px;z-index:2;transform:rotate(-12deg);cursor:pointer}
+  .tag{position:absolute;right:6%;top:14px;z-index:2;padding:4px 12px 5px;background:#fff;border:1px solid rgba(196,98,127,.4);border-radius:3px;transform:rotate(9deg);font:600 1.05rem Caveat,cursive;color:#c2475f;box-shadow:0 3px 8px rgba(80,45,65,.2)}
+  .star{position:absolute;width:26px;height:26px;cursor:pointer}
+  .star.s1{right:12%;bottom:62px}.star.s2{right:6%;bottom:40px;width:20px;height:20px}
+  .love{position:absolute;left:12%;bottom:24px;margin:0;font:600 1.25rem Caveat,cursive;color:#3d4a7c;transform:rotate(-3deg)}
+
+  .film{position:relative;margin:30px auto 0;padding:24px 0;background:#161216;border-radius:6px;transform:rotate(-1deg);box-shadow:0 18px 34px rgba(60,30,50,.4)}
+  .film::before,.film::after{content:"";position:absolute;left:0;right:0;height:9px;background:repeating-linear-gradient(90deg,transparent 0 9px,#efe6da 9px 19px,transparent 19px 28px);opacity:.85}
+  .film::before{top:7px}.film::after{bottom:7px}
+  .frames{display:flex;gap:12px;overflow-x:auto;padding:0 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .frames::-webkit-scrollbar{display:none}
+  .frame{flex:none;width:clamp(120px,36vw,170px);aspect-ratio:4/3;border:2px solid #000;background:#2a2326;overflow:hidden}
+  .frame img,.frame .ph{display:block;width:100%;height:100%;object-fit:cover}
+  .frame .ph{font-size:.95rem}.frame .ph svg{width:24px;height:24px}
+  .bow{position:absolute;left:-10px;top:-14px;width:54px;height:40px;z-index:3;transform:rotate(-14deg);cursor:pointer}
+  #miniPlay{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;width:48px;height:48px;padding:0;border:0;border-radius:50%;display:none;place-items:center;cursor:pointer;color:#fff;background:linear-gradient(180deg,#e07a96,#c4627f);box-shadow:0 10px 22px rgba(196,98,127,.45)}
+  #book.on ~ #miniPlay{display:grid}
+  #miniPlay svg{width:18px;height:18px}
+  .drop{animation:stick .8s cubic-bezier(.2,1.25,.4,1) both}
+  @keyframes stick{from{opacity:0;transform:translateY(-40px) scale(.8) rotate(-10deg)}}
 
   @media (prefers-reduced-motion:reduce){
     .ff,.dancer,.armL,.armR,.tail,#envelope,.eshadow,.hint i{animation:none!important}
     .flapF,.flapB,.lt{transition-duration:.01ms!important;transition-delay:0s!important}
-    .avatar,.cover.spin{animation:none!important}
+    .avatar,.cover.spin,.drop,.stk.wob{animation:none!important}
   }
 </style>
 </head>
@@ -230,16 +287,34 @@
       </div>
       <audio id="song" preload="metadata" playsinline></audio>
       <p class="hand" id="songNote"></p>
-      <button class="cta" id="albumBtn" type="button" hidden>See our album &rarr;</button>
+      <button class="cta" id="albumBtn" type="button">See our album &rarr;</button>
       <div><button id="again" class="btn-ghost" type="button">Replay</button></div>
     </div>
   </div>
 </section>
 
-<div id="album" role="dialog" aria-modal="true" aria-label="Photo album">
-  <div class="polaroid"><img id="albImg" alt=""><p id="albCap"></p></div>
-  <div class="row"><button class="btn-ghost" id="albPrev" type="button">&#9666; Prev</button><button class="btn-ghost" id="albNext" type="button">Next &#9656;</button><button class="btn-ghost" id="albClose" type="button">Close</button></div>
-</div>
+<section id="book" aria-label="Photo album">
+  <div class="bk">
+    <div class="bk-top"><button class="bk-back" id="bkBack" type="button">&larr; Back</button><div class="bk-title">our little album</div></div>
+    <div class="notebook" id="notebook">
+      <div class="pg pgL">
+        <div class="agewrap"><div class="age" id="bkAge"></div><svg class="stk cup" id="cup" viewBox="0 0 64 64" role="img" aria-label="cupcake"></svg></div>
+        <p class="hwm" id="bkMsg"></p>
+      </div>
+      <div class="spine" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pg pgR">
+        <div class="tape" aria-hidden="true"></div>
+        <svg class="stk flower" id="flower" viewBox="0 0 48 48" role="img" aria-label="flower sticker"></svg>
+        <div class="tag" id="bkTag"></div>
+        <figure class="pol" id="bkPol" tabindex="0" role="button" aria-label="Next photo"><div class="phwrap" id="phWrap"></div><figcaption id="bkCap"></figcaption></figure>
+        <svg class="stk star s1" id="star1" viewBox="0 0 24 24" role="img" aria-label="star"></svg><svg class="stk star s2" id="star2" viewBox="0 0 24 24" role="img" aria-label="star"></svg>
+        <p class="love" id="bkLove"></p>
+      </div>
+    </div>
+    <div class="film" id="filmWrap"><div class="frames" id="frames"></div><svg class="stk bow" id="bow" viewBox="0 0 54 40" role="img" aria-label="bow"></svg></div>
+  </div>
+</section>
+<button id="miniPlay" type="button" aria-label="Play or pause the song"></button>
 <script>
 const $ = s => document.querySelector(s);
 const rnd = (a, b) => Math.random() * (b - a) + a;
@@ -377,12 +452,20 @@ const CONFIG = {
   song: "assets/song.mp3",
   songNote: "ye gaana isliye chuna, kyunki ye hamesha tumhari yaad dilata hai",
   avatar: "",                       // your photo of him: path/URL, or just drop assets/avatar.png (auto-detected)
-  photos: []                        // album: [["assets/p1.jpg", "caption"], ...]. Empty = album button hidden
+  photos: [],                       // album photos: [["assets/p1.jpg", "caption"], ...]  (empty = soft placeholders)
+  // Album / scrapbook page
+  gingham: "pink",                  // "pink" or "blue"  (also via link: ?gingham=blue)
+  age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
+  photoLabel: "Favorite person",    // little tag on the polaroid
+  photoCaption: "ye wali sabse pyaari hai",
+  loveNote: "love you",
+  bookMessage: "Happy Birthday, {name}!\n\nEk aur saal, ek aur chapter. Tumhare saath har page thoda aur rangeen lagta hai. Is saal sirf hansi, sukoon, aur wo sab jo tumne chupke se maanga hai.\n\n{from}"
 };
 const qs = new URLSearchParams(location.search);
 if (qs.get("name")) CONFIG.name = qs.get("name").slice(0, 30);
 if (qs.get("from")) CONFIG.from = qs.get("from").slice(0, 30);
 document.title = `Happy Birthday ${CONFIG.name}`;
+document.body.dataset.gingham = qs.get("gingham") === "blue" ? "blue" : CONFIG.gingham;
 document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -532,18 +615,69 @@ mountAvatar();
 function showCard(){
   $("#card").classList.add("on");
   song.play().catch(() => {});             // allowed: the envelope tap counts as the user gesture
-  if (CONFIG.photos.length) $("#albumBtn").hidden = false;
   chord([392, 523.25, 659.25], .04);
 }
 $("#again").addEventListener("click", () => location.reload());
 
-/* album */
-let ai = 0;
-function showAlbum(){ const [src, cap] = CONFIG.photos[ai]; $("#albImg").src = src; $("#albCap").textContent = cap || ""; $("#albPrev").disabled = ai === 0; $("#albNext").disabled = ai === CONFIG.photos.length - 1; }
-$("#albumBtn").addEventListener("click", () => { ai = 0; showAlbum(); $("#album").classList.add("on"); });
-$("#albPrev").addEventListener("click", () => { if (ai > 0){ ai--; showAlbum(); } });
-$("#albNext").addEventListener("click", () => { if (ai < CONFIG.photos.length - 1){ ai++; showAlbum(); } });
-$("#albClose").addEventListener("click", () => $("#album").classList.remove("on"));
+/* ---------- scrapbook / album ---------- */
+const STICKERS = {
+  cup: `<path d="M14 34h36l-6 24H20z" fill="#e9a76a"/><path d="M22 34l2 24M32 34v24M42 34l-2 24" stroke="#cf8650" stroke-width="1.4"/>
+    <ellipse cx="32" cy="32" rx="21" ry="8" fill="#f9b2cb"/><ellipse cx="32" cy="23" rx="15" ry="7.5" fill="#f58bb3"/><ellipse cx="32" cy="15.5" rx="9" ry="5.5" fill="#f9b2cb"/>
+    <circle cx="32" cy="8" r="4.2" fill="#e0405a"/><path d="M32 4q2-3 5-3" stroke="#5c8a4a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <g stroke-width="1.8" stroke-linecap="round"><path d="M22 28l2-1" stroke="#fff"/><path d="M40 29l2 1" stroke="#ffe27a"/><path d="M30 20l2 1" stroke="#fff"/><path d="M36 17l1-2" stroke="#ffe27a"/></g>`,
+  flower: `<g>${Array.from({length: 5}, (_, i) => `<ellipse cx="24" cy="11" rx="7" ry="10" fill="#ffd84a" stroke="#d9a21a" stroke-width="1.2" transform="rotate(${i * 72} 24 24)"/>`).join("")}</g><circle cx="24" cy="24" r="6.5" fill="#f29b3a" stroke="#c97a1e" stroke-width="1.2"/>`,
+  star: `<polygon points="12,2 15,9 22,9.5 16.5,14 18.5,21.5 12,17.5 5.5,21.5 7.5,14 2,9.5 9,9" fill="#e6e9ef" stroke="#9aa3b2" stroke-width="1.2" stroke-linejoin="round"/>`,
+  bow: `<ellipse cx="16" cy="18" rx="14" ry="9" fill="#f58bb3" stroke="#d6618f" stroke-width="1.3" transform="rotate(-22 16 18)"/><ellipse cx="38" cy="18" rx="14" ry="9" fill="#f58bb3" stroke="#d6618f" stroke-width="1.3" transform="rotate(22 38 18)"/>
+    <path d="M25 22L16 38l9-5zM29 22l9 16-9-5z" fill="#f06c9b" stroke="#d6618f" stroke-width="1.2" stroke-linejoin="round"/><circle cx="27" cy="19" r="5.5" fill="#e6568a" stroke="#d6618f" stroke-width="1.2"/>`
+};
+for (const [id, k] of [["cup","cup"],["flower","flower"],["star1","star"],["star2","star"],["bow","bow"]]) $("#" + id).innerHTML = STICKERS[k];
+const CAMERA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></svg>';
+function photoNode(entry){
+  if (entry){ const img = new Image(); img.alt = entry[1] || ""; img.decoding = "async"; img.src = entry[0]; return img; }
+  const d = document.createElement("div"); d.className = "ph"; d.innerHTML = CAMERA + "<span>your photo</span>"; return d;
+}
+let bookBuilt = false, polIdx = 0, filmUser = false, filmRAF = 0, filmPos = 0;
+function setPolaroid(){
+  const e = CONFIG.photos[polIdx];
+  $("#phWrap").replaceChildren(photoNode(e));
+  $("#bkCap").textContent = (e && e[1]) || CONFIG.photoCaption;
+}
+function buildBook(){
+  $("#bkAge").textContent = CONFIG.age || "HBD";
+  $("#bkMsg").textContent = fill(CONFIG.bookMessage);
+  $("#bkTag").textContent = CONFIG.photoLabel;
+  $("#bkLove").textContent = CONFIG.loveNote;
+  setPolaroid();
+  const rest = CONFIG.photos.slice(1), frames = $("#frames"); frames.replaceChildren();
+  for (let i = 0; i < Math.max(6, rest.length); i++){ const f = document.createElement("div"); f.className = "frame"; f.appendChild(photoNode(rest[i])); frames.appendChild(f); }
+  $("#bkPol").addEventListener("click", () => {
+    if (CONFIG.photos.length > 1){ polIdx = (polIdx + 1) % CONFIG.photos.length; setPolaroid(); }
+    const p = $("#bkPol"); p.classList.remove("swap"); void p.offsetWidth; p.classList.add("swap"); blip(pick([659, 784, 880]), .3, .04);
+  });
+  $("#bkPol").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("#bkPol").click(); } });
+  document.querySelectorAll("#book .stk").forEach(el => el.addEventListener("click", () => {
+    el.classList.remove("wob"); void el.getBoundingClientRect(); el.classList.add("wob"); blip(pick([784, 880, 988, 1175]), .35, .04); setTimeout(() => el.classList.remove("wob"), 650); }));
+  ["pointerdown", "wheel", "touchstart"].forEach(ev => frames.addEventListener(ev, () => { filmUser = true; }, {passive: true}));
+  [".pgL", ".pgR", ".film"].forEach((sel, i) => { const el = $("#book " + sel); el.classList.add("drop"); el.style.animationDelay = (.15 + i * .25) + "s"; });
+}
+function filmDrift(){
+  const f = $("#frames");
+  if (!filmUser && !reduceMotion){ filmPos += .45; if (filmPos >= f.scrollWidth - f.clientWidth) filmPos = 0; f.scrollLeft = filmPos; } else filmPos = f.scrollLeft;
+  filmRAF = requestAnimationFrame(filmDrift);
+}
+function openBook(){
+  if (!bookBuilt){ buildBook(); bookBuilt = true; }
+  $("#book").scrollTop = 0; $("#book").classList.add("on"); filmUser = false; filmPos = 0; $("#frames").scrollLeft = 0;
+  cancelAnimationFrame(filmRAF); filmDrift(); chord([523.25, 659.25, 783.99], .04);
+}
+function closeBook(){ $("#book").classList.remove("on"); cancelAnimationFrame(filmRAF); }
+$("#albumBtn").addEventListener("click", openBook);
+$("#bkBack").addEventListener("click", closeBook);
+/* mini player keeps the song under control while you browse the album */
+const miniPlay = $("#miniPlay");
+const syncMini = () => { miniPlay.innerHTML = song.paused ? IC_PLAY : IC_PAUSE; };
+song.addEventListener("play", syncMini); song.addEventListener("pause", syncMini); syncMini();
+miniPlay.addEventListener("click", () => { if (song.paused) song.play().catch(() => {}); else song.pause(); });
 </script>
 </body>
 </html>
