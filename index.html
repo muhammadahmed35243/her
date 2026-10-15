@@ -134,6 +134,40 @@
   .cta:active{transform:scale(.97)}
   .cta[hidden]{display:none}
   /* =========================================================
+     "Why you're special": peach-pink gradient, flip cards, petals
+     ========================================================= */
+  #why{position:fixed;inset:0;z-index:55;display:none;overflow-x:hidden;overflow-y:auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));color:#5a2b3a;
+    background:radial-gradient(90% 60% at 0% 0%,#ffe3b0 0%,rgba(255,227,176,0) 60%),linear-gradient(140deg,#ffd3a8 0%,#ffc2cf 36%,#f7b2c7 70%,#e9aec6 100%)}
+  #why.on{display:flex;animation:fadeIn .9s ease both}
+  .petals{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .pet{position:absolute;top:-40px;animation:petFall linear infinite;will-change:transform}
+  @keyframes petFall{to{transform:translate(var(--dx,30px),112vh) rotate(var(--rot,260deg))}}
+  .wy{position:relative;z-index:1;margin:auto;width:min(100%,640px);text-align:center}
+  .wy-title{display:inline-block;max-width:100%;padding:16px 30px 14px;border-radius:26px;background:rgba(255,255,255,.64);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.85);box-shadow:0 16px 36px rgba(190,80,110,.22)}
+  .wy-title h2{display:flex;align-items:center;justify-content:center;gap:8px;margin:0;font:400 clamp(2.1rem,9vw,3.1rem)/1.05 'Great Vibes',cursive;color:#d6456b}
+  .wy-title h2 svg{width:38px;height:38px;flex:none}
+  .wy-title p{margin:6px 0 0;font:500 .8rem Inter,sans-serif;color:#8a5566}
+  .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,2.4vw,16px);margin:22px auto 0}
+  .wc{perspective:900px;aspect-ratio:1/1.1;padding:0;border:0;background:none;cursor:pointer;text-align:center;font:inherit;transition:transform .25s}
+  .wc:hover{transform:translateY(-3px)}
+  .wc:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:16px}
+  .wc .in{position:relative;display:block;width:100%;height:100%;transition:transform .75s cubic-bezier(.3,1.2,.4,1);transform-style:preserve-3d}
+  .wc.open .in{transform:rotateY(180deg)}
+  .wc .f,.wc .b{position:absolute;inset:0;display:grid;place-items:center;padding:8px;border-radius:16px;-webkit-backface-visibility:hidden;backface-visibility:hidden;border:1px solid rgba(255,255,255,.8);box-shadow:0 10px 20px rgba(190,80,110,.22)}
+  .wc .f{background:linear-gradient(145deg,rgba(255,255,255,.6),rgba(255,132,160,.55));font:700 clamp(1.7rem,7.4vw,2.5rem) Inter,sans-serif;color:#c4162d;text-shadow:0 2px 0 rgba(255,255,255,.5)}
+  .wc .b{transform:rotateY(180deg);background:linear-gradient(145deg,#ffe8b6,#ffd2a2);font:600 clamp(.68rem,2.9vw,.92rem)/1.38 Inter,sans-serif;color:#4a2e2a}
+  .wcount{margin:18px 0 0;font:600 .66rem Inter,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#8a4a5f}
+  .wnav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:14px}
+  .wnext{font:700 .95rem Inter,sans-serif;color:#fff;background:linear-gradient(180deg,#ff7a90,#ef4a67);border:0;border-radius:999px;padding:14px 38px;cursor:pointer;box-shadow:0 12px 26px rgba(239,74,103,.4);transition:transform .15s}
+  .wnext:active{transform:scale(.96)}
+  .wback{font:600 .66rem Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#8a4a5f;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.8);border-radius:999px;padding:12px 18px;cursor:pointer}
+  .wnext:focus-visible,.wback:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  #trail{position:fixed;inset:0;z-index:70;pointer-events:none;opacity:0;transition:opacity .5s}
+  #trail.live{opacity:1;transition:opacity .15s}
+  #trail i{position:absolute;left:0;top:0;font-style:normal;line-height:1;color:#e0183c;text-shadow:0 1px 0 rgba(255,255,255,.55);will-change:transform}
+  #why.on ~ #miniPlay{display:grid}
+
+  /* =========================================================
      Scrapbook / album: gingham, notebook spread, polaroid, film strip
      ========================================================= */
   #book{position:fixed;inset:0;z-index:60;display:none;overflow-x:hidden;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 96px;color:#3d466b;
@@ -226,7 +260,8 @@
   @media (prefers-reduced-motion:reduce){
     .ff,.dancer,.armL,.armR,.tail,#envelope,.eshadow,.hint i{animation:none!important}
     .flapF,.flapB,.lt{transition-duration:.01ms!important;transition-delay:0s!important}
-    .avatar,.cover.spin,.drop,.stk.wob{animation:none!important}
+    .avatar,.cover.spin,.drop,.stk.wob,.pet{animation:none!important}
+    .wc .in{transition-duration:.01ms!important}
   }
 </style>
 </head>
@@ -311,9 +346,20 @@
       </div>
       <audio id="song" preload="metadata" playsinline></audio>
       <p class="hand" id="songNote"></p>
-      <button class="cta" id="albumBtn" type="button">See our album &rarr;</button>
+      <button class="cta" id="cardNext" type="button">Next &#9825;</button>
       <div><button id="again" class="btn-ghost" type="button">Replay</button></div>
     </div>
+  </div>
+</section>
+
+<section id="why" aria-label="Why you are special">
+  <div class="petals" id="petals" aria-hidden="true"></div>
+  <div id="trail" aria-hidden="true"></div>
+  <div class="wy">
+    <div class="wy-title"><h2>Why You're Special <svg id="wyCup" viewBox="0 0 64 64" aria-hidden="true"></svg></h2><p id="wySub"></p></div>
+    <div class="wgrid" id="wgrid"></div>
+    <div class="wcount" id="wcount" aria-live="polite"></div>
+    <div class="wnav"><button class="wback" id="whyBack" type="button">&larr; Back</button><button class="wnext" id="whyNext" type="button">Next &#9825;</button></div>
   </div>
 </section>
 
@@ -496,6 +542,19 @@ const CONFIG = {
   songNote: "ye gaana isliye chuna, kyunki ye hamesha tumhari yaad dilata hai",
   avatar: "",                       // your photo of him: path/URL, or just drop assets/avatar.png (auto-detected)
   photos: [],                       // album photos: [["assets/p1.jpg", "caption"], ...]  (empty = soft placeholders)
+  // "Why you're special" cards (any number; 9 fills the 3x3 grid)
+  whySub: "Tap the cards to find out why",
+  reasons: [
+    "Tumhari hansi sunke saari thakaan gayab ho jaati hai",
+    "Tum bina bole samajh jaate ho (bas late reply chhodke)",
+    "Gusse mein bhi tumhara chehra kitna cute lagta hai",
+    "Tumhare saath chup rehna bhi sabse comfortable hai",
+    "Har mushkil mein tum sabse pehle yaad aate ho",
+    "Tumhari bakwaas meri favourite podcast hai",
+    "Tumhare saath har safar, lamba ho ya chhota, best lagta hai",
+    "Tum jaise bas ek hi ho. Koi copy nahi",
+    "Aur sabse badi wajah: bas tum ho, {name}"
+  ],
   // Album / scrapbook page
   gingham: "pink",                  // "pink" or "blue"  (also via link: ?gingham=blue)
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
@@ -664,6 +723,82 @@ function showCard(){
 }
 $("#again").addEventListener("click", () => location.reload());
 
+/* ---------- "Why you're special" ---------- */
+function heartBurst(x, y, n = 8){
+  for (let i = 0; i < n; i++){
+    const h = document.createElement("div"); h.textContent = pick(["♥", "♥", "❤", "❀"]);
+    h.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:80;pointer-events:none;font-size:${rnd(12, 24)}px;color:${pick(["#ff4d6d", "#ff8fa3", "#ffb347", "#fff"])}`;
+    document.body.appendChild(h);
+    const dx = rnd(-90, 90), dy = rnd(-120, -30);
+    h.animate([{transform: "translate(0,0) scale(.6)", opacity: 1}, {transform: `translate(${dx}px,${dy}px) scale(1.2) rotate(${rnd(-40, 40)}deg)`, opacity: 0}], {duration: rnd(700, 1200), easing: "ease-out"}).finished.then(() => h.remove());
+  }
+}
+let whyBuilt = false, whyOpen = 0;
+function buildWhy(){
+  $("#wySub").textContent = fill(CONFIG.whySub);
+  $("#wyCup").innerHTML = STICKERS.cup;
+  const grid = $("#wgrid"); grid.replaceChildren(); whyOpen = 0;
+  CONFIG.reasons.forEach((r, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "wc"; b.setAttribute("aria-label", `Card ${i + 1}, tap to reveal`);
+    b.innerHTML = '<span class="in"><span class="f">?</span><span class="b" aria-hidden="true"></span></span>';
+    b.querySelector(".b").textContent = fill(r);
+    b.addEventListener("click", () => {
+      if (b.classList.contains("open")) return;
+      b.classList.add("open"); b.setAttribute("aria-label", fill(r)); b.querySelector(".b").removeAttribute("aria-hidden"); whyOpen++;
+      const rc = b.getBoundingClientRect(); heartBurst(rc.left + rc.width / 2, rc.top + rc.height / 2, 7);
+      blip(523.25 * Math.pow(1.122, whyOpen % 8), .35, .05);
+      updateWhyCount();
+      if (whyOpen === CONFIG.reasons.length){ chord([523.25, 659.25, 783.99, 1046.5], .06); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .4, 26), 350); }
+    });
+    grid.appendChild(b);
+  });
+  updateWhyCount();
+  // drifting petals and hearts
+  const pet = $("#petals"); pet.replaceChildren();
+  const heart = c => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z" fill="${c}"/></svg>`;
+  const leaf = c => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2c5 4 7 9 0 20C5 11 7 6 12 2z" fill="${c}"/></svg>`;
+  for (let i = 0; i < 20; i++){
+    const d = document.createElement("div"), sz = rnd(12, 30), cols = ["#ff6b8a", "#ffb3c1", "#ffd166", "#ff9aa8", "#fff1f4"];
+    d.className = "pet"; d.style.cssText = `left:${rnd(0, 100)}%;width:${sz}px;height:${sz}px;opacity:${rnd(.45, .9)};animation-duration:${rnd(9, 18)}s;animation-delay:${-rnd(0, 16)}s;--dx:${rnd(-60, 60)}px;--rot:${rnd(-360, 360)}deg`;
+    d.innerHTML = Math.random() > .5 ? heart(pick(cols)) : leaf(pick(cols)); pet.appendChild(d);
+  }
+}
+function updateWhyCount(){ $("#wcount").textContent = `${whyOpen} / ${CONFIG.reasons.length} opened`; }
+/* A chain of hearts that follows the cursor (or a finger while it is down) */
+const TRAIL_N = 22, trailEl = $("#trail"), trailPts = [];
+let trailTarget = {x: innerWidth / 2, y: innerHeight / 2}, trailIdle = 0, trailRAF = 0;
+if (!reduceMotion) for (let i = 0; i < TRAIL_N; i++){
+  const h = document.createElement("i"); h.textContent = "♥";
+  const k = i / (TRAIL_N - 1);
+  h.style.fontSize = (18 - 11 * k).toFixed(1) + "px"; h.style.opacity = (1 - .65 * k).toFixed(2);
+  trailEl.appendChild(h); trailPts.push({x: trailTarget.x, y: trailTarget.y, el: h});
+}
+function trailLoop(t){
+  if (!$("#why").classList.contains("on")){ trailRAF = 0; trailEl.classList.remove("live"); return; }
+  let px = trailTarget.x, py = trailTarget.y;
+  trailPts.forEach((p, i) => {
+    const ease = .42 - i * .009;                       // tail lags a little more than the head
+    p.x += (px - p.x) * ease; p.y += (py - p.y) * ease;
+    const wob = Math.sin(t / 170 + i * .55) * 2.2;     // gentle wave along the chain
+    p.el.style.transform = `translate(${(p.x + wob).toFixed(1)}px,${(p.y + wob * .6).toFixed(1)}px) translate(-50%,-50%)`;
+    px = p.x; py = p.y;
+  });
+  if (performance.now() - trailIdle > 900) trailEl.classList.remove("live");
+  trailRAF = requestAnimationFrame(trailLoop);
+}
+$("#why").addEventListener("pointermove", e => {
+  if (reduceMotion) return;
+  if (e.pointerType === "mouse" || e.buttons || e.pressure) { trailTarget = {x: e.clientX, y: e.clientY}; }
+  trailIdle = performance.now();
+  if (!trailEl.classList.contains("live")){ trailPts.forEach(p => { p.x = trailTarget.x; p.y = trailTarget.y; }); trailEl.classList.add("live"); }
+  if (!trailRAF) trailRAF = requestAnimationFrame(trailLoop);
+});
+$("#why").addEventListener("pointerleave", () => trailEl.classList.remove("live"));
+function openWhy(){ if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); }
+$("#cardNext").addEventListener("click", openWhy);
+$("#whyBack").addEventListener("click", () => $("#why").classList.remove("on"));
+$("#whyNext").addEventListener("click", openBook);
+
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {
   cup: `<path d="M14 34h36l-6 24H20z" fill="#e9a76a"/><path d="M22 34l2 24M32 34v24M42 34l-2 24" stroke="#cf8650" stroke-width="1.4"/>
@@ -746,7 +881,6 @@ function openBook(){
   cancelAnimationFrame(filmRAF); filmDrift(); chord([523.25, 659.25, 783.99], .04);
 }
 function closeBook(){ $("#book").classList.remove("on"); cancelAnimationFrame(filmRAF); }
-$("#albumBtn").addEventListener("click", openBook);
 $("#bkBack").addEventListener("click", closeBook);
 /* mini player keeps the song under control while you browse the album */
 const miniPlay = $("#miniPlay");
