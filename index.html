@@ -136,7 +136,7 @@
   /* =========================================================
      "Why you're special": peach-pink gradient, flip cards, petals
      ========================================================= */
-  #why{position:fixed;inset:0;z-index:55;display:none;overflow-x:hidden;overflow-y:auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));color:#5a2b3a;
+  #why{position:fixed;inset:0;z-index:65;display:none;overflow-x:hidden;overflow-y:auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));color:#5a2b3a;
     background:radial-gradient(90% 60% at 0% 0%,#ffe3b0 0%,rgba(255,227,176,0) 60%),linear-gradient(140deg,#ffd3a8 0%,#ffc2cf 36%,#f7b2c7 70%,#e9aec6 100%)}
   #why.on{display:flex;animation:fadeIn .9s ease both}
   .petals{position:fixed;inset:0;pointer-events:none;overflow:hidden}
@@ -162,7 +162,7 @@
   .wnext:active{transform:scale(.96)}
   .wback{font:600 .66rem Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#8a4a5f;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.8);border-radius:999px;padding:12px 18px;cursor:pointer}
   .wnext:focus-visible,.wback:focus-visible{outline:2px solid #fff;outline-offset:3px}
-  #trail{position:fixed;inset:0;z-index:70;pointer-events:none;opacity:0;transition:opacity .5s}
+  #trail{position:fixed;inset:0;z-index:95;pointer-events:none;opacity:0;transition:opacity .5s}
   #trail.live{opacity:1;transition:opacity .15s}
   #trail i{position:absolute;left:0;top:0;font-style:normal;line-height:1;color:#e0183c;text-shadow:0 1px 0 rgba(255,255,255,.55);will-change:transform}
   #why.on ~ #miniPlay{display:grid}
@@ -180,6 +180,7 @@
   .bk-top{display:flex;align-items:center;justify-content:space-between;margin:6px 0 16px}
   .bk-back{font:600 .66rem Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#7b4a5d;background:rgba(255,255,255,.8);border:1px solid rgba(196,98,127,.3);border-radius:999px;padding:10px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(110,55,85,.12)}
   .bk-back:focus-visible,#miniPlay:focus-visible,#bkPol:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+  .bk-end{text-align:center;margin-top:30px}
   .bk-title{font:600 1.5rem Caveat,cursive;color:#8a4a62}
 
   .books{perspective:1700px;touch-action:pan-y;-webkit-user-select:none;user-select:none}
@@ -346,7 +347,7 @@
       </div>
       <audio id="song" preload="metadata" playsinline></audio>
       <p class="hand" id="songNote"></p>
-      <button class="cta" id="cardNext" type="button">Next &#9825;</button>
+      <button class="cta" id="cardNext" type="button">See our album &rarr;</button>
       <div><button id="again" class="btn-ghost" type="button">Replay</button></div>
     </div>
   </div>
@@ -354,12 +355,11 @@
 
 <section id="why" aria-label="Why you are special">
   <div class="petals" id="petals" aria-hidden="true"></div>
-  <div id="trail" aria-hidden="true"></div>
   <div class="wy">
     <div class="wy-title"><h2>Why You're Special <svg id="wyCup" viewBox="0 0 64 64" aria-hidden="true"></svg></h2><p id="wySub"></p></div>
     <div class="wgrid" id="wgrid"></div>
     <div class="wcount" id="wcount" aria-live="polite"></div>
-    <div class="wnav"><button class="wback" id="whyBack" type="button">&larr; Back</button><button class="wnext" id="whyNext" type="button">Next &#9825;</button></div>
+    <div class="wnav"><button class="wback" id="whyBack" type="button">&larr; Back</button><button class="wnext" id="whyNext" type="button">Replay &#8635;</button></div>
   </div>
 </section>
 
@@ -401,9 +401,11 @@
     </div>
     <div class="pager"><button class="pgbtn" id="pgPrev" type="button" disabled>&#9666; Prev</button><span id="pgNum" aria-live="polite">1 / 2</span><button class="pgbtn" id="pgNext" type="button">Next page &#9656;</button></div>
     <div class="film" id="filmWrap"><div class="frames" id="frames"></div><svg class="stk bow" id="bow" viewBox="0 0 54 40" role="img" aria-label="bow"></svg></div>
+    <div class="bk-end"><button class="cta" id="bkNext" type="button">Next &#9825;</button></div>
   </div>
 </section>
 <button id="miniPlay" type="button" aria-label="Play or pause the song"></button>
+<div id="trail" aria-hidden="true"></div>
 <script>
 const $ = s => document.querySelector(s);
 const rnd = (a, b) => Math.random() * (b - a) + a;
@@ -764,7 +766,7 @@ function buildWhy(){
   }
 }
 function updateWhyCount(){ $("#wcount").textContent = `${whyOpen} / ${CONFIG.reasons.length} opened`; }
-/* A chain of hearts that follows the cursor (or a finger while it is down) */
+/* A chain of hearts that follows the cursor (or a finger while it is down), on every screen */
 const TRAIL_N = 22, trailEl = $("#trail"), trailPts = [];
 let trailTarget = {x: innerWidth / 2, y: innerHeight / 2}, trailIdle = 0, trailRAF = 0;
 if (!reduceMotion) for (let i = 0; i < TRAIL_N; i++){
@@ -774,30 +776,29 @@ if (!reduceMotion) for (let i = 0; i < TRAIL_N; i++){
   trailEl.appendChild(h); trailPts.push({x: trailTarget.x, y: trailTarget.y, el: h});
 }
 function trailLoop(t){
-  if (!$("#why").classList.contains("on")){ trailRAF = 0; trailEl.classList.remove("live"); return; }
   let px = trailTarget.x, py = trailTarget.y;
   trailPts.forEach((p, i) => {
-    const ease = .42 - i * .009;                       // tail lags a little more than the head
+    const ease = .42 - i * .009;                       // the tail lags a little more than the head
     p.x += (px - p.x) * ease; p.y += (py - p.y) * ease;
     const wob = Math.sin(t / 170 + i * .55) * 2.2;     // gentle wave along the chain
     p.el.style.transform = `translate(${(p.x + wob).toFixed(1)}px,${(p.y + wob * .6).toFixed(1)}px) translate(-50%,-50%)`;
     px = p.x; py = p.y;
   });
-  if (performance.now() - trailIdle > 900) trailEl.classList.remove("live");
-  trailRAF = requestAnimationFrame(trailLoop);
+  const idle = performance.now() - trailIdle;
+  if (idle > 900) trailEl.classList.remove("live");
+  trailRAF = idle > 1700 ? 0 : requestAnimationFrame(trailLoop);   // stop the loop once it has faded out
 }
-$("#why").addEventListener("pointermove", e => {
+document.addEventListener("pointermove", e => {
   if (reduceMotion) return;
-  if (e.pointerType === "mouse" || e.buttons || e.pressure) { trailTarget = {x: e.clientX, y: e.clientY}; }
-  trailIdle = performance.now();
+  trailTarget = {x: e.clientX, y: e.clientY}; trailIdle = performance.now();
   if (!trailEl.classList.contains("live")){ trailPts.forEach(p => { p.x = trailTarget.x; p.y = trailTarget.y; }); trailEl.classList.add("live"); }
   if (!trailRAF) trailRAF = requestAnimationFrame(trailLoop);
 });
-$("#why").addEventListener("pointerleave", () => trailEl.classList.remove("live"));
+document.documentElement.addEventListener("mouseleave", () => trailEl.classList.remove("live"));
 function openWhy(){ if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); }
-$("#cardNext").addEventListener("click", openWhy);
+$("#cardNext").addEventListener("click", openBook);
 $("#whyBack").addEventListener("click", () => $("#why").classList.remove("on"));
-$("#whyNext").addEventListener("click", openBook);
+$("#whyNext").addEventListener("click", () => location.reload());   // last screen of the flow
 
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {
@@ -882,6 +883,7 @@ function openBook(){
 }
 function closeBook(){ $("#book").classList.remove("on"); cancelAnimationFrame(filmRAF); }
 $("#bkBack").addEventListener("click", closeBook);
+$("#bkNext").addEventListener("click", openWhy);       // the "Why you're special" cards come last
 /* mini player keeps the song under control while you browse the album */
 const miniPlay = $("#miniPlay");
 const syncMini = () => { miniPlay.innerHTML = song.paused ? IC_PLAY : IC_PAUSE; };
