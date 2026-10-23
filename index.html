@@ -25,6 +25,11 @@
   @keyframes ripple{from{transform:scale(.8);opacity:.9}to{transform:scale(1.5);opacity:0}}
   /* garden -> continue pill */
   /* the one big "next" button, fixed to the bottom of every screen */
+  #steps{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));z-index:84;display:flex;gap:7px;transform:translateX(-50%);padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.9);box-shadow:0 6px 16px rgba(110,70,105,.12);opacity:0;pointer-events:none;transition:opacity .6s}
+  #steps.show{opacity:1}
+  #steps i{width:7px;height:7px;border-radius:50%;background:var(--rose-soft);transition:width .4s var(--ease),background .4s}
+  #steps i.done{background:var(--rose)}
+  #steps i.cur{width:22px;border-radius:7px;background:var(--rose)}
   #goFade{position:fixed;left:0;right:0;bottom:0;height:calc(120px + env(safe-area-inset-bottom));z-index:84;pointer-events:none;opacity:0;transition:opacity .5s;background:linear-gradient(to top,rgba(250,244,248,.96) 30%,rgba(250,244,248,0))}
   #goFade.on{opacity:1}
   #go{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));z-index:85;display:flex;align-items:center;justify-content:center;gap:12px;
@@ -213,7 +218,7 @@
   #lantern.on ~ #miniPlay{display:grid}
 
   /* =========================================================
-     Very last screen: good bye
+     Very last screen: the closing wish
      ========================================================= */
   #bye{position:fixed;inset:0;z-index:79;display:none;overflow-x:hidden;overflow-y:auto;text-align:center;color:var(--ink);background:var(--page);padding:0 22px max(118px,calc(98px + env(safe-area-inset-bottom)))}
   #bye.on{display:flex;animation:fadeIn 1s ease both}
@@ -223,7 +228,7 @@
   #bye.on .by-wrap > *{animation:byUp 1.1s var(--ease) forwards;animation-delay:calc(.6s + var(--i) * .4s)}
   @keyframes byUp{to{opacity:1;transform:none}}
   .by-ey,.by-foot{font:600 .64rem Inter,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
-  .by-title{margin:8px 0 0;font:400 clamp(3.6rem,18vw,5.6rem)/1 'Great Vibes',cursive;color:var(--rose)}
+  .by-title{margin:8px 0 0;font:400 clamp(2.8rem,13vw,4.4rem)/1.05 'Great Vibes',cursive;color:var(--rose)}
   .by-note{margin:14px auto 0;max-width:36ch;font:italic 400 1.04rem/1.8 'Playfair Display',Georgia,serif;color:var(--ink-soft);white-space:pre-line}
   .by-sign{margin-top:14px;font:400 2.2rem/1.1 'Great Vibes',cursive;color:var(--rose)}
   .by-foot{margin-top:20px}
@@ -457,15 +462,15 @@
   </div>
 </section>
 
-<section id="bye" aria-label="Good bye">
+<section id="bye" aria-label="Closing wish">
   <button class="btn-ghost by-back" id="byBack" type="button">&larr; Back</button>
   <div class="by-wrap">
-    <div class="by-ey" style="--i:0">until next time</div>
+    <div class="by-ey" style="--i:0">with all my love</div>
     <div class="by-title" id="byTitle" style="--i:1"></div>
     <div class="dash" style="--i:2"><span>&#10049;</span></div>
     <p class="by-note" id="byNote" style="--i:3"></p>
     <div class="by-sign" id="bySign" style="--i:4"></div>
-    <div class="by-foot" style="--i:5">made with love</div>
+    <div class="by-foot" style="--i:5">once again, happy birthday</div>
   </div>
 </section>
 
@@ -510,6 +515,7 @@
   </div>
 </section>
 <button id="miniPlay" type="button" aria-label="Play or pause the song"></button>
+<div id="steps" aria-hidden="true"></div>
 <div id="goFade" aria-hidden="true"></div>
 <button id="go" type="button" aria-live="polite"><span id="goLabel"></span><span class="arr" id="goArr" aria-hidden="true">&#9656;</span></button>
 <div id="trail" aria-hidden="true"></div>
@@ -667,9 +673,9 @@ const CONFIG = {
   // Last screen (lantern)
   lanternHint: "Pull the string",
   finalNote: "Tum jahan bhi jao, apni roshni saath le jaana. Meri taraf se bahut saara pyaar, aur ek bada sa Happy Birthday.",
-  // Good bye screen (the very last one)
-  byeTitle: "Good bye",
-  byeNote: "Ye chhota sa safar yahin khatam hota hai, par jo yaadein humne banayi hain wo kahin nahi jaatin.\n\nJab bhi thak jao, jab bhi kuch achha lage, ya bas yunhi, yaad rakhna ki koi hai jo tumhari har khushi mein tumse zyada khush hota hai.\n\nTake care, hamesha muskurate rehna. Phir milte hain, jald hi.",
+  // Closing wish screen (the very last one)
+  closingTitle: "Many Happy Returns",
+  closingNote: "Aane wala har din tumhare liye utna hi khoobsurat ho jitne tum ho.\n\nJo sapne tumne dil mein rakhe hain, wo is saal ek ek karke poore hon. Aur jab bhi thak jao, jab bhi kuch achha lage, ya bas yunhi, yaad rakhna ki koi hai jo tumhari har khushi mein tumse zyada khush hota hai.\n\nKhush raho, muskurate raho, aur apni roshni se sabko jagmagate raho.",
   // Album / scrapbook page
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
   photoLabel: "Favorite person",    // little tag on the polaroid
@@ -694,6 +700,8 @@ function setGo(label, handler, delay = 0, icon = "\u25B8", fade = true){
   if (!label) return;
   goTimer = setTimeout(() => { $("#goLabel").textContent = label; $("#goArr").textContent = icon; goHandler = handler; goBtn.classList.add("show"); $("#goFade").classList.toggle("on", fade); }, delay);
 }
+const stepsEl = $("#steps"); for (let i = 0; i < 7; i++) stepsEl.appendChild(document.createElement("i"));
+function setStep(n){ [...stepsEl.children].forEach((d, i) => { d.classList.toggle("cur", i === n); d.classList.toggle("done", i < n); }); stepsEl.classList.toggle("show", n >= 1); }   // shown from the hello page on
 goBtn.addEventListener("click", () => { if (goHandler){ blip(660, .1, .05); goHandler(); } });
 addEventListener("keydown", e => { if (e.key === "Enter" && document.activeElement === document.body && goHandler && goBtn.classList.contains("show")) goHandler(); });
 
@@ -703,7 +711,7 @@ async function leaveGarden(){
   heroSound(); setGo(null);
   const g = $("#garden"), a = g.animate([{opacity: 1}, {opacity: 0}], {duration: 900, fill: "forwards"});
   await a.finished; g.style.display = "none"; a.cancel();
-  $("#hello").classList.add("on"); if (heroVideo) heroVideo.currentTime = 0; chord([523.25, 659.25, 783.99], .045);
+  setStep(1); $("#hello").classList.add("on"); if (heroVideo) heroVideo.currentTime = 0; chord([523.25, 659.25, 783.99], .045);
   setGo("Open the envelope", openEnvelope, 1000);
 }
 
@@ -840,7 +848,7 @@ mountAvatar();
   d.innerHTML = flatFlower(sz, c, m); $("#ffwrap2").appendChild(d);
 });
 function showCard(){
-  $("#card").classList.add("on");
+  setStep(2); $("#card").classList.add("on");
   song.play().catch(() => {});             // allowed: the envelope tap counts as the user gesture
   chord([392, 523.25, 659.25], .04);
   setGo("See our album", openBook, 1200);
@@ -917,8 +925,8 @@ document.addEventListener("pointermove", e => {
   if (!trailRAF) trailRAF = requestAnimationFrame(trailLoop);
 });
 document.documentElement.addEventListener("mouseleave", () => trailEl.classList.remove("live"));
-function openWhy(){ if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); setGo("One last thing", openLantern, 800); }
-$("#whyBack").addEventListener("click", () => { $("#why").classList.remove("on"); updateBookGo(); });
+function openWhy(){ setStep(4); if (!whyBuilt){ buildWhy(); whyBuilt = true; } $("#why").scrollTop = 0; $("#why").classList.add("on"); chord([392, 523.25, 659.25], .04); setGo("One last thing", openLantern, 800); }
+$("#whyBack").addEventListener("click", () => { setStep(3); $("#why").classList.remove("on"); updateBookGo(); });
 
 /* ---------- last screen: the lantern ---------- */
 const svgHeart = c => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z" fill="${c}"/></svg>`;
@@ -940,8 +948,9 @@ $("#finalNote").textContent = fill(CONFIG.finalNote);
 { const beads = $("#beads"); for (let y = 238; y < 336; y += 8){ const c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("cx", 100); c.setAttribute("cy", y); c.setAttribute("r", 2.4); beads.appendChild(c); } }
 let lit = false;
 function openLantern(){
+  setStep(5);
   $("#lantern").scrollTop = 0; $("#lantern").classList.add("on");
-  if (lit) setGo("Say good bye", openGoodbye, 600); else setGo(CONFIG.lanternHint, pullLantern, 900, "↓");
+  if (lit) setGo("One more wish", openClosing, 600); else setGo(CONFIG.lanternHint, pullLantern, 900, "↓");
 }
 function pullLantern(){
   if (lit) return; lit = true;
@@ -950,7 +959,7 @@ function pullLantern(){
   blip(1500, .05, .08); setTimeout(() => blip(900, .08, .06), 70); setTimeout(() => chord([523.25, 659.25, 783.99, 1046.5], .07), 350);
   const r = $("#lanternSvg").getBoundingClientRect(); heartBurst(r.left + r.width / 2, r.top + r.height * .36, 18);
   setTimeout(() => petalRain(), 500); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .35, 20), 1400);
-  setGo("Say good bye", openGoodbye, 3200);
+  setGo("One more wish", openClosing, 3200);
 }
 /* the chain: tap it, or drag it down and let go */
 {
@@ -965,46 +974,17 @@ function pullLantern(){
   handle.addEventListener("pointerup", end); handle.addEventListener("pointercancel", end);
   handle.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pullLantern(); } });
 }
-$("#lnBack").addEventListener("click", () => { $("#lantern").classList.remove("on"); setGo("One last thing", openLantern, 400); });
+$("#lnBack").addEventListener("click", () => { setStep(4); $("#lantern").classList.remove("on"); setGo("One last thing", openLantern, 400); });
 
-/* ---------- the very last screen: good bye ---------- */
-$("#byTitle").textContent = CONFIG.byeTitle; $("#byNote").textContent = fill(CONFIG.byeNote); $("#bySign").textContent = CONFIG.from;
-let byeFade = 0;
-function fadeSong(ms = 9000){                                   // the music fades out, then stops
-  cancelAnimationFrame(byeFade);
-  if (song.paused) return;                                      // nothing to fade
-  song.volume = .5; if (Math.abs(song.volume - .5) > .01){ song.volume = 1; return; }   // iOS keeps volume fixed: just let it play
-  song.volume = 1; const t0 = performance.now();
-  const step = t => { const k = Math.min(1, Math.max(0, (t - t0) / ms)); song.volume = Math.min(1, Math.max(0, 1 - k));
-    if (k < 1 && !song.paused) byeFade = requestAnimationFrame(step); else if (k >= 1){ song.pause(); song.volume = 1; } };
-  byeFade = requestAnimationFrame(step);
-}
-function flyPlane(){                                            // an original paper plane drawing a dotted trail across the screen
-  if (reduceMotion) return;
-  const W = innerWidth, H = innerHeight, NS = "http://www.w3.org/2000/svg", DUR = 3800;
-  const box = document.createElement("div"); box.style.cssText = "position:fixed;inset:0;z-index:78;pointer-events:none;overflow:hidden";
-  const P0 = {x: -70, y: H * .78}, P1 = {x: W * .5, y: -H * .05}, P2 = {x: W + 80, y: H * .16};
-  const pt = t => ({x: (1 - t) ** 2 * P0.x + 2 * (1 - t) * t * P1.x + t * t * P2.x, y: (1 - t) ** 2 * P0.y + 2 * (1 - t) * t * P1.y + t * t * P2.y});
-  const ang = t => Math.atan2(2 * (1 - t) * (P1.y - P0.y) + 2 * t * (P2.y - P1.y), 2 * (1 - t) * (P1.x - P0.x) + 2 * t * (P2.x - P1.x)) * 180 / Math.PI;
-  const svg = document.createElementNS(NS, "svg"); svg.setAttribute("width", W); svg.setAttribute("height", H); svg.style.cssText = "position:absolute;inset:0";
-  for (let i = 0; i <= 30; i++){
-    const t = i / 30, p = pt(t), c = document.createElementNS(NS, "circle");
-    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", 2.2); c.setAttribute("fill", "#d9708f"); c.style.opacity = 0; svg.appendChild(c);
-    c.animate([{opacity: 0}, {opacity: .85, offset: .12}, {opacity: .85, offset: .6}, {opacity: 0}], {duration: 2600, delay: t * DUR * .92, fill: "forwards"});
-  }
-  box.appendChild(svg);
-  const plane = document.createElement("div"); plane.style.cssText = "position:absolute;left:0;top:0;width:58px;height:40px";
-  plane.innerHTML = '<svg viewBox="0 0 60 40" width="100%" height="100%"><polygon points="4,6 58,20 4,34 16,20" fill="#fffdf8" stroke="#c4627f" stroke-width="1.8" stroke-linejoin="round"/><polygon points="16,20 58,20 4,34" fill="#f1d3dc" stroke="#c4627f" stroke-width="1.8" stroke-linejoin="round"/></svg>';
-  plane.style.filter = "drop-shadow(0 6px 8px rgba(110,70,105,.25))"; box.appendChild(plane); document.body.appendChild(box);
-  const frames = Array.from({length: 41}, (_, i) => { const t = i / 40, p = pt(t); return {transform: `translate(${p.x}px,${p.y}px) translate(-50%,-50%) rotate(${ang(t)}deg) scale(${1 - .35 * t})`, offset: t}; });
-  plane.animate(frames, {duration: DUR, easing: "ease-in-out", fill: "forwards"}).finished.then(() => setTimeout(() => box.remove(), 2600));
-}
-function openGoodbye(){
+/* ---------- the very last screen: the closing wish ---------- */
+$("#byTitle").textContent = CONFIG.closingTitle; $("#byNote").textContent = fill(CONFIG.closingNote); $("#bySign").textContent = CONFIG.from;
+function openClosing(){
+  setStep(6);
   $("#bye").scrollTop = 0; $("#bye").classList.add("on");
-  chord([392, 493.88, 587.33], .05); flyPlane(); fadeSong();
-  setGo("Replay", () => location.reload(), 4200, "↻");
+  chord([392, 523.25, 659.25, 783.99], .05); petalRain(48); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 22), 900);
+  setGo("Relive it", () => location.reload(), 4200, "↻");
 }
-$("#byBack").addEventListener("click", () => { $("#bye").classList.remove("on"); cancelAnimationFrame(byeFade); song.volume = 1; setGo("Say good bye", openGoodbye, 400); });
+$("#byBack").addEventListener("click", () => { setStep(5); $("#bye").classList.remove("on"); setGo("One more wish", openClosing, 400); });
 
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {
@@ -1085,11 +1065,12 @@ function goSpread(n){
 /* the big button inside the album: turn the page first, then continue to the cards */
 function updateBookGo(){ if (spread === 0) setGo("Next page", () => goSpread(1), 500); else setGo("Continue", openWhy, 500); }
 function openBook(){
+  setStep(3);
   if (!bookBuilt){ buildBook(); bookBuilt = true; }
   $("#book").scrollTop = 0; $("#book").classList.add("on"); filmUser = false; filmPos = 0; $("#frames").scrollLeft = 0;
   cancelAnimationFrame(filmRAF); filmDrift(); chord([523.25, 659.25, 783.99], .04); updateBookGo();
 }
-function closeBook(){ $("#book").classList.remove("on"); cancelAnimationFrame(filmRAF); setGo("See our album", openBook, 400); }
+function closeBook(){ setStep(2); $("#book").classList.remove("on"); cancelAnimationFrame(filmRAF); setGo("See our album", openBook, 400); }
 $("#bkBack").addEventListener("click", closeBook);
 /* mini player keeps the song under control while you browse the album */
 const miniPlay = $("#miniPlay");
