@@ -322,7 +322,6 @@
   .by-foot{margin-top:20px}
   .by-foot.big{font:400 1.7rem/1.3 'Great Vibes',cursive;letter-spacing:0;text-transform:none;color:var(--rose)}
   .by-line{margin:14px 0 0;font:400 1.9rem/1.25 'Great Vibes',cursive;color:var(--rose);white-space:pre-line}
-  .by-note.poem{max-width:44ch;font-size:1.02rem;line-height:1.9}
   .by-note.sm{font-size:.98rem;line-height:1.75;max-width:40ch}
   .snap .phwrap img{object-position:center 22%}
   .frame img{object-position:center 22%}
@@ -492,16 +491,6 @@
     <p class="by-note sm" id="finNote" style="--i:2"></p>
     <div class="by-line" id="finEnd" style="--i:3"></div>
     <div class="by-sign" id="finSign" style="--i:4"></div>
-  </div>
-</section>
-
-<section id="poem" class="byeScr" aria-label="Poem">
-  <button class="btn-ghost by-back" id="poemBack" type="button">&larr; Back</button>
-  <div class="by-wrap">
-    <div class="by-title" id="poemTitle" style="--i:0"></div>
-    <div class="dash" style="--i:1"><span>&#10049;</span></div>
-    <p class="by-note poem" id="poemNote" style="--i:2"></p>
-    <div class="by-sign" id="poemSign" style="--i:3"></div>
   </div>
 </section>
 
@@ -712,10 +701,6 @@ const CONFIG = {
   finalMsg: "Mai bs itna kehna chahti hun k hamesha khush rehna jo b hamare beech hua usy bhar mai bejhen yaad rakhna isnt worth it nd chill pill hoky pehly ki tarah life guzaren nd apny dostun sy thori duri hi rakhen 1 sy bar k 1 mujhy cheap lgta hai.\n\nHmne bht koshish ki k sab sai hojai lkin ni hopaya but koi ni life hai\nThis shall too pass \u{1F61D}\n\nAj mai apki life sy proper exit krny wali hun just imagine my chap in ur life as foramen ovale\nJo k kuch duration ke liye open rehta hai phir chap close hojata hai achnak or apny remnants chor jata hai\n(My embryo is not so good but at least im putting efforts for u \u{1F61E})\n\nBaki khush rhen yr Allah apko bht khushiyan dy or achy logun sy apko milwai Ameen suma Ameen \u{1FAF6}",
   finalEnd: "Happiest Birthday ever!!!!\nGoodbye Zasham\nI love u",
   finalSign: "Ur haanu",
-  // Poem screen (after the goodbye)
-  poemTitle: "Happy birthday zea!!",
-  poemNote: "Ik that Distance has changed the way things are\nWe are no longer close, though once we were not far.\nI dont wish to turn back time or make u stay,\nIm just grateful that life let me know u anyway.",
-  poemSign: "Ur haanu",
   // Album / scrapbook page
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
   photoLabel: "Favorite person",    // little tag on the polaroid
@@ -743,7 +728,7 @@ function setGo(label, handler, delay = 0, icon = "\u25B8", fade = true){
   if (!label) return;
   goTimer = setTimeout(() => { $("#goLabel").textContent = label; $("#goArr").textContent = icon; goHandler = handler; goBtn.classList.add("show"); $("#goFade").classList.toggle("on", fade); }, delay);
 }
-const stepsEl = $("#steps"); for (let i = 0; i < 8; i++) stepsEl.appendChild(document.createElement("i"));
+const stepsEl = $("#steps"); for (let i = 0; i < 7; i++) stepsEl.appendChild(document.createElement("i"));
 function setStep(n){ [...stepsEl.children].forEach((d, i) => { d.classList.toggle("cur", i === n); d.classList.toggle("done", i < n); }); stepsEl.classList.toggle("show", n >= 1); }   // shown from the hello page on
 goBtn.addEventListener("click", () => { if (goHandler){ blip(660, .1, .05); goHandler(); } });
 addEventListener("keydown", e => { if (e.key === "Enter" && document.activeElement === document.body && goHandler && goBtn.classList.contains("show")) goHandler(); });
@@ -1040,19 +1025,9 @@ function openFinal(){
   setStep(6);
   $("#fin").scrollTop = 0; $("#fin").classList.add("on");
   chord([392, 493.88, 587.33, 783.99], .05); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 22), 1200);
-  setGo("Next", openPoem, 6000);
+  setGo("Relive it", () => location.reload(), 6000, "↻");
 }
 $("#finBack").addEventListener("click", () => { setStep(5); $("#fin").classList.remove("on"); setGo("Next", openFinal, 400); });
-
-/* ---------- the very last screen: the poem ---------- */
-$("#poemTitle").textContent = CONFIG.poemTitle; $("#poemNote").textContent = CONFIG.poemNote; $("#poemSign").textContent = CONFIG.poemSign;
-function openPoem(){
-  setStep(7);
-  $("#poem").scrollTop = 0; $("#poem").classList.add("on");
-  chord([392, 493.88, 587.33, 783.99], .05); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 20), 1200);
-  setGo("Relive it", () => location.reload(), 4500, "↻");
-}
-$("#poemBack").addEventListener("click", () => { setStep(6); $("#poem").classList.remove("on"); setGo("Next", openPoem, 400); });
 
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {
