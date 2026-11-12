@@ -378,6 +378,7 @@
           <polygon points="10,50 120,100 10,154" fill="url(#pocketG)" stroke="#c3a58f" stroke-width="1" stroke-linejoin="round"/>
           <polygon points="230,50 120,100 230,154" fill="url(#pocketG)" stroke="#c3a58f" stroke-width="1" stroke-linejoin="round"/>
           <polygon points="10,154 120,100 230,154" fill="url(#paperG)" stroke="#c3a58f" stroke-width="1" stroke-linejoin="round"/>
+          <text id="envTo" x="120" y="143" text-anchor="middle" font-family="Caveat,cursive" font-size="21" font-weight="700" fill="#a24562"></text>
           <g class="flapF">
             <polygon points="10,50 230,50 120,110" fill="url(#flapG)" stroke="#c3a58f" stroke-width="1" stroke-linejoin="round"/>
             <circle cx="120" cy="104" r="12" fill="url(#sealG)"/><circle cx="120" cy="104" r="12" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
@@ -723,6 +724,7 @@ if (qs.get("name")) CONFIG.name = qs.get("name").slice(0, 30);
 if (qs.get("from")) CONFIG.from = qs.get("from").slice(0, 30);
 document.title = `Happy Birthday ${CONFIG.name}`;
 document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
+$("#envTo").textContent = `For ${CONFIG.name}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -805,11 +807,13 @@ function mountVideo(){
   v.setAttribute("playsinline", ""); v.setAttribute("aria-label", "A short flying-kiss clip");
   if (CONFIG.videoPoster) v.poster = CONFIG.videoPoster;
   let shown = false;
-  v.addEventListener("canplay", () => {
+  const show = () => {
     if (shown) return; shown = true;
     const box = $("#dancer"); box.className = "dancer clip"; box.replaceChildren(v);
     heroVideo = v; v.muted = !soundOn; v.play().catch(() => {});
-  });
+  };
+  v.addEventListener("canplay", show); v.addEventListener("loadeddata", show);
+  setTimeout(() => { if (!shown && v.readyState >= 2) show(); }, 3000);
   v.addEventListener("error", () => { if (!shown) mountGif(); });
   v.src = CONFIG.video;
 }
