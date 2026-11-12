@@ -18,7 +18,7 @@ A big **Next** button is fixed to the bottom of every screen, and a chain of hea
 | Path | What it is |
 | --- | --- |
 | `index.html` | the whole site (HTML, CSS, JS) |
-| `assets/song.mp3` | the dedicated song |
+| `assets/song.m4a` | the dedicated song |
 | `assets/kiss.mp4`, `assets/kiss.jpg` | hero clip and its poster frame |
 | `assets/avatar.png` *(optional)* | his photo for the round avatar; a monogram shows until it exists |
 
