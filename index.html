@@ -491,6 +491,7 @@
     <p class="by-note sm" id="finNote" style="--i:2"></p>
     <div class="by-line" id="finEnd" style="--i:3"></div>
     <div class="by-sign" id="finSign" style="--i:4"></div>
+    <p class="by-note sm" id="finDua" style="--i:5"></p>
   </div>
 </section>
 
@@ -673,7 +674,7 @@ const CONFIG = {
   nickname: "Zasham",
   message: "{name}, aaj ke din ka har pal tumhara hai. Garden ke saare phool, ye gaana, ye chhoti si site, sab tumhare liye.\n\nTumhare saath hansna, ladna, aur bekaar baaton par ghanton baat karna, ye sab mere saal ki sabse achhi yaadein hain. Khush rehna, aise hi.\n\nHappy Birthday!",
   song: "assets/song.m4a",
-  songNote: "ye gaana isliye chuna, kyunki ye hamesha tumhari yaad dilata hai",
+  songNote: "this song is for u cz once i felt like this song for u",
   avatar: "",                       // your photo of him: path/URL, or just drop assets/avatar.png (auto-detected)
   photos: [["assets/image1.webp", "tum"], ["assets/image3.webp", "bachpan"], ["assets/image2.webp", "abhi"]],   // 1 = polaroid, 2 = childhood page, 3 = present page
   // "Why you're special" cards (any number; 9 fills the 3x3 grid)
@@ -701,6 +702,7 @@ const CONFIG = {
   finalMsg: "Mai bs itna kehna chahti hun k hamesha khush rehna jo b hamare beech hua usy bhar mai bejhen yaad rakhna isnt worth it nd chill pill hoky pehly ki tarah life guzaren nd apny dostun sy thori duri hi rakhen 1 sy bar k 1 mujhy cheap lgta hai.\n\nHmne bht koshish ki k sab sai hojai lkin ni hopaya but koi ni life hai\nThis shall too pass \u{1F61D}\n\nAj mai apki life sy proper exit krny wali hun just imagine my chap in ur life as foramen ovale\nJo k kuch duration ke liye open rehta hai phir chap close hojata hai achnak or apny remnants chor jata hai\n(My embryo is not so good but at least im putting efforts for u \u{1F61E})\n\nBaki khush rhen yr Allah apko bht khushiyan dy or achy logun sy apko milwai Ameen suma Ameen \u{1FAF6}",
   finalEnd: "Happiest Birthday ever!!!!\nGoodbye Zasham\nI love u",
   finalSign: "Ur haanu",
+  finalDua: "Allah apko hamesha khush rakhy or apki life mai jitni b pareshaniyan hain unko duur krde Ameen apki har jaiz khuwaish ko pura kry or apki pyari c smile ko hamesha apky chehry py saja k rakhy Ameen suma Ameen\n\nHAPPIEST BIRTHDAY EVER!!!! \u{1F61D}\u{1F91F}",
   // Album / scrapbook page
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
   photoLabel: "Favorite person",    // little tag on the polaroid
@@ -1020,7 +1022,7 @@ function openOnceAgain(){
 $("#by2Back").addEventListener("click", () => { setStep(4); $("#bye2").classList.remove("on"); setGo("Next", openOnceAgain, 400); });
 
 /* ---------- the very last screen: goodbye ---------- */
-$("#finTitle").textContent = CONFIG.finalTitle; $("#finNote").textContent = fill(CONFIG.finalMsg); $("#finEnd").textContent = CONFIG.finalEnd; $("#finSign").textContent = CONFIG.finalSign;
+$("#finTitle").textContent = CONFIG.finalTitle; $("#finNote").textContent = fill(CONFIG.finalMsg); $("#finEnd").textContent = CONFIG.finalEnd; $("#finSign").textContent = CONFIG.finalSign; $("#finDua").textContent = CONFIG.finalDua;
 function openFinal(){
   setStep(6);
   $("#fin").scrollTop = 0; $("#fin").classList.add("on");
