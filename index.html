@@ -66,7 +66,8 @@
   .eyebrow-l::before,.eyebrow-l::after{content:"";width:30px;height:1px;background:linear-gradient(90deg,transparent,var(--rose-soft))}
   .eyebrow-l::after{transform:scaleX(-1)}
   #hello h1{font:600 clamp(2rem,8.4vw,3rem)/1.12 'Playfair Display',Georgia,serif;letter-spacing:-.015em;margin:18px 0 0;color:var(--ink)}
-  .script{font:400 clamp(2rem,8.6vw,2.7rem)/1.05 'Great Vibes',cursive;color:var(--rose);margin:6px 0 0}
+  .script{font:400 clamp(1.7rem,7vw,2.3rem)/1.1 'Great Vibes',cursive;color:var(--rose);margin:6px 0 0}
+  .hello-note{font-size:1.1rem;margin:8px 8px 0;white-space:pre-line;text-align:center}
 
   .stage{position:relative;width:min(78vw,330px);margin-top:clamp(2px,1.4vh,14px)}
   .dancer svg,.dancer img{display:block;width:100%;height:auto}
@@ -217,27 +218,6 @@
   .lt-final p{margin:12px auto 0;max-width:34ch;font:italic 400 1rem/1.7 'Playfair Display',Georgia,serif;color:var(--ink-soft)}
   #lantern.on ~ #miniPlay{display:grid}
 
-  /* =========================================================
-     Very last screen: the closing wish
-     ========================================================= */
-  .byeScr{position:fixed;inset:0;z-index:79;display:none;overflow-x:hidden;overflow-y:auto;text-align:center;color:var(--ink);background:var(--page);padding:0 22px max(118px,calc(98px + env(safe-area-inset-bottom)))}
-  .byeScr.on{display:flex;animation:fadeIn 1s ease both}
-  .by-back{position:absolute;left:14px;top:max(14px,env(safe-area-inset-top));z-index:3}
-  .by-wrap{position:relative;z-index:2;margin:auto;width:min(100%,480px);padding-top:64px}
-  .by-wrap > *{opacity:0;transform:translateY(14px)}
-  .byeScr.on .by-wrap > *{animation:byUp 1.1s var(--ease) forwards;animation-delay:calc(.6s + var(--i) * .4s)}
-  @keyframes byUp{to{opacity:1;transform:none}}
-  .by-ey,.by-foot{font:600 .64rem Inter,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
-  .by-title{margin:8px 0 0;font:400 clamp(2.8rem,13vw,4.4rem)/1.05 'Great Vibes',cursive;color:var(--rose)}
-  .by-note{margin:14px auto 0;max-width:36ch;font:italic 400 1.04rem/1.8 'Playfair Display',Georgia,serif;color:var(--ink-soft);white-space:pre-line}
-  .by-sign{margin-top:14px;font:400 2.2rem/1.1 'Great Vibes',cursive;color:var(--rose)}
-  .by-foot{margin-top:20px}
-  .by-foot.big{font:400 1.7rem/1.3 'Great Vibes',cursive;letter-spacing:0;text-transform:none;color:var(--rose)}
-  .by-line{margin:14px 0 0;font:400 1.9rem/1.25 'Great Vibes',cursive;color:var(--rose);white-space:pre-line}
-  .by-note.sm{font-size:.98rem;line-height:1.75;max-width:40ch}
-  .snap .phwrap img,.pol .phwrap img{object-position:center 35%}
-  .frame img{object-position:center 35%}
-  .byeScr.on ~ #miniPlay{display:grid}
 
   /* =========================================================
      Scrapbook / album: gingham, notebook spread, polaroid, film strip
@@ -325,7 +305,6 @@
   @keyframes stick{from{opacity:0;transform:translateY(-40px) scale(.8) rotate(-10deg)}}
 
   @media (prefers-reduced-motion:reduce){
-    .by-wrap > *{opacity:1!important;transform:none!important;animation:none!important}
     .ff,.dancer,.armL,.armR,.tail,#envelope,.eshadow,.hint i{animation:none!important}
     .flapF,.flapB,.lt{transition-duration:.01ms!important;transition-delay:0s!important}
     .avatar,.cover.spin,.drop,.stk.wob,.pet,#go.show,#go .arr,.lt-swing,.lt-swing.kick,#lantern.lit .lt-glow{animation:none!important}
@@ -358,7 +337,8 @@
   <div class="hw">
     <div class="eyebrow-l">Made with love</div>
     <h1>Hello <span class="nm"></span></h1>
-    <div class="script">happy birthday</div>
+    <div class="script" id="helloScript"></div>
+    <p class="hand hello-note" id="helloNote"></p>
     <div class="stage">
       <div class="dancer" id="dancer" role="img" aria-label="A little cat dancing"></div>
       <div id="envelope" role="button" tabindex="0" aria-label="Open the envelope">
@@ -468,38 +448,6 @@
   </div>
 </section>
 
-<section id="bye" class="byeScr" aria-label="Closing wish">
-  <button class="btn-ghost by-back" id="byBack" type="button">&larr; Back</button>
-  <div class="by-wrap">
-    <div class="by-ey" style="--i:0">with all my love</div>
-    <div class="by-title" id="byTitle" style="--i:1"></div>
-    <div class="dash" style="--i:2"><span>&#10049;</span></div>
-    <p class="by-note" id="byNote" style="--i:3"></p>
-    <div class="by-sign" id="bySign" style="--i:4"></div>
-    <div class="by-foot" style="--i:5">once again, happy birthday</div>
-  </div>
-</section>
-
-<section id="bye2" class="byeScr" aria-label="Once again">
-  <button class="btn-ghost by-back" id="by2Back" type="button">&larr; Back</button>
-  <div class="by-wrap">
-    <div class="by-title" id="by2Title" style="--i:0"></div>
-    <div class="dash" style="--i:1"><span>&#10049;</span></div>
-    <p class="by-note" id="by2Note" style="--i:2"></p>
-    <div class="by-foot big" id="by2Foot" style="--i:3"></div>
-  </div>
-</section>
-
-<section id="fin" class="byeScr" aria-label="Goodbye">
-  <button class="btn-ghost by-back" id="finBack" type="button">&larr; Back</button>
-  <div class="by-wrap">
-    <div class="by-title" id="finTitle" style="--i:0"></div>
-    <div class="dash" style="--i:1"><span>&#10049;</span></div>
-    <p class="by-note sm" id="finNote" style="--i:2"></p>
-    <div class="by-line" id="finEnd" style="--i:3"></div>
-    <div class="by-sign" id="finSign" style="--i:4"></div>
-  </div>
-</section>
 
 <section id="book" aria-label="Photo album">
   <div class="bk">
@@ -676,8 +624,8 @@ const CONFIG = {
   videoPoster: "assets/kiss.jpg",
   catGif: "",                       // optional fallback GIF: direct URL / path, e.g. "assets/cat.gif"
   // Card page
-  nickname: "My Hero",              // script line under "Happy Birthday"
-  message: "{name}, aaj ke din ka har pal tumhara hai. Garden ke saare phool, ye gaana, ye chhoti si site, sab tumhare liye.\n\nTumhare saath hansna, ladna, aur bekaar baaton par ghanton baat karna, ye sab mere saal ki sabse achhi yaadein hain. Khush rehna, aise hi.\n\nHappy Birthday!",
+  nickname: "Zasham",
+  message: "Happy 21th birthday Zasham!!\n\nMai bs itna kehna chahti hun k hamesha khush rehna jo b hamare beech hua usy bhar mai bejhen yaad rakhna isnt worth it nd chill pill hoky pehly ki tarah life guzaren nd apny dostun sy thori duri hi rakhen 1 sy bar k 1 mujhy cheap lgta hai.\n\nHmne bht koshish ki k sab sai hojai lkin ni hopaya but koi ni life hai\nThis shall too pass \u{1F61D}\n\nAj mai apki life sy proper exit krny wali hun just imagine my chap in ur life as foramen ovale\nJo k kuch duration ke liye open rehta hai phir chap close hojata hai achnak or apny remnants chor jata hai\n(My embryo is not so good but at least im putting efforts for u \u{1F61E})\n\nBaki khush rhen yr Allah apko bht khushiyan dy or achy logun sy apko milwai Ameen suma Ameen \u{1FAF6}\n\nHappiest Birthday ever!!!!\nGoodbye Zasham\nI love u\nUr haanu",
   song: "assets/song.mp3",
   songNote: "ye gaana isliye chuna, kyunki ye hamesha tumhari yaad dilata hai",
   avatar: "",                       // your photo of him: path/URL, or just drop assets/avatar.png (auto-detected)
@@ -698,18 +646,6 @@ const CONFIG = {
   // Last screen (lantern)
   lanternHint: "Pull the string",
   finalNote: "Tum jahan bhi jao, apni roshni saath le jaana. Meri taraf se bahut saara pyaar, aur ek bada sa Happy Birthday.",
-  // Closing wish screen (the very last one)
-  closingTitle: "Many Happy Returns",
-  closingNote: "Aane wala har din tumhare liye utna hi khoobsurat ho jitne tum ho.\n\nJo sapne tumne dil mein rakhe hain, wo is saal ek ek karke poore hon. Aur jab bhi thak jao, jab bhi kuch achha lage, ya bas yunhi, yaad rakhna ki koi hai jo tumhari har khushi mein tumse zyada khush hota hai.\n\nKhush raho, muskurate raho, aur apni roshni se sabko jagmagate raho.",
-  // After the closing wish
-  onceTitle: "Once again happiest birthday Zashamm",
-  onceNote: "Enjoy ur bdy with ur friends nd family sbse interact krna or hamesha khush rehna nd fazool btun ka stress ni lena na sochna\nNd bs proffs py dehan dena!!",
-  onceFoot: "Happy birthday \u{1F61D}\u{1F380}",
-  // Very last screen
-  finalTitle: "Happy 21th birthday Zasham!!",
-  finalMsg: "Mai bs itna kehna chahti hun k hamesha khush rehna jo b hamare beech hua usy bhar mai bejhen yaad rakhna isnt worth it nd chill pill hoky pehly ki tarah life guzaren nd apny dostun sy thori duri hi rakhen 1 sy bar k 1 mujhy cheap lgta hai.\n\nHmne bht koshish ki k sab sai hojai lkin ni hopaya but koi ni life hai\nThis shall too pass \u{1F61D}\n\nAj mai apki life sy proper exit krny wali hun just imagine my chap in ur life as foramen ovale\nJo k kuch duration ke liye open rehta hai phir chap close hojata hai achnak or apny remnants chor jata hai\n(My embryo is not so good but at least im putting efforts for u \u{1F61E})\n\nBaki khush rhen yr Allah apko bht khushiyan dy or achy logun sy apko milwai Ameen suma Ameen \u{1FAF6}",
-  finalEnd: "Happiest Birthday ever!!!!\nGoodbye Zasham\nI love u",
-  finalSign: "Ur haanu",
   // Album / scrapbook page
   age: "",                          // big number on the notebook, e.g. 21 (empty shows "HBD")
   photoLabel: "Favorite person",    // little tag on the polaroid
@@ -717,13 +653,16 @@ const CONFIG = {
   loveNote: "love you",
   pageTextL: "Kuch pal camera mein nahi, dil mein reh gaye. Phir bhi yahan kuch tasveerein, taaki jab bhi dekho, muskurahat aa jaye.",
   pageTextR: "Saal ke har mod par tumhara saath mila. Dua hai ki ye pages kabhi khatam na hon, bas naye jud-te jaayein.",
-  bookMessage: "Happy Birthday, {name}!\n\nEk aur saal, ek aur chapter. Tumhare saath har page thoda aur rangeen lagta hai. Is saal sirf hansi, sukoon, aur wo sab jo tumne chupke se maanga hai.\n\n{from}"
+  bookMessage: "Many Happy Returns\n\nAane wala har din tumhare liye utna hi khoobsurat ho jitne tum ho.\n\nJo sapne tumne dil mein rakhe hain, wo is saal ek ek karke poore hon. Aur jab bhi thak jao, jab bhi kuch achha lage, ya bas yunhi, yaad rakhna ki koi hai jo tumhari har khushi mein tumse zyada khush hota hai.\n\nKhush raho, muskurate raho, aur apni roshni se sabko jagmagate raho.\n\n{from}",
+  helloScript: "Once again happiest birthday Zashamm",
+  helloNote: "Enjoy ur bdy with ur friends nd family sbse interact krna or hamesha khush rehna nd fazool btun ka stress ni lena na sochna\nNd bs proffs py dehan dena!!\n\nHappy birthday \u{1F61D}\u{1F380}"
 };
 const qs = new URLSearchParams(location.search);
 if (qs.get("name")) CONFIG.name = qs.get("name").slice(0, 30);
 if (qs.get("from")) CONFIG.from = qs.get("from").slice(0, 30);
 document.title = `Happy Birthday ${CONFIG.name}`;
 document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
+$("#helloScript").textContent = CONFIG.helloScript; $("#helloNote").textContent = CONFIG.helloNote;
 $("#envTo").textContent = `For ${CONFIG.name}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -735,7 +674,7 @@ function setGo(label, handler, delay = 0, icon = "\u25B8", fade = true){
   if (!label) return;
   goTimer = setTimeout(() => { $("#goLabel").textContent = label; $("#goArr").textContent = icon; goHandler = handler; goBtn.classList.add("show"); $("#goFade").classList.toggle("on", fade); }, delay);
 }
-const stepsEl = $("#steps"); for (let i = 0; i < 9; i++) stepsEl.appendChild(document.createElement("i"));
+const stepsEl = $("#steps"); for (let i = 0; i < 6; i++) stepsEl.appendChild(document.createElement("i"));
 function setStep(n){ [...stepsEl.children].forEach((d, i) => { d.classList.toggle("cur", i === n); d.classList.toggle("done", i < n); }); stepsEl.classList.toggle("show", n >= 1); }   // shown from the hello page on
 goBtn.addEventListener("click", () => { if (goHandler){ blip(660, .1, .05); goHandler(); } });
 addEventListener("keydown", e => { if (e.key === "Enter" && document.activeElement === document.body && goHandler && goBtn.classList.contains("show")) goHandler(); });
@@ -987,7 +926,7 @@ let lit = false;
 function openLantern(){
   setStep(5);
   $("#lantern").scrollTop = 0; $("#lantern").classList.add("on");
-  if (lit) setGo("One more wish", openClosing, 600); else setGo(CONFIG.lanternHint, pullLantern, 900, "↓");
+  if (lit) setGo("Relive it", () => location.reload(), 600, "↻"); else setGo(CONFIG.lanternHint, pullLantern, 900, "↓");
 }
 function pullLantern(){
   if (lit) return; lit = true;
@@ -996,7 +935,7 @@ function pullLantern(){
   blip(1500, .05, .08); setTimeout(() => blip(900, .08, .06), 70); setTimeout(() => chord([523.25, 659.25, 783.99, 1046.5], .07), 350);
   const r = $("#lanternSvg").getBoundingClientRect(); heartBurst(r.left + r.width / 2, r.top + r.height * .36, 18);
   setTimeout(() => petalRain(), 500); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .35, 20), 1400);
-  setGo("One more wish", openClosing, 3200);
+  setGo("Relive it", () => location.reload(), 3200, "↻");
 }
 /* the chain: tap it, or drag it down and let go */
 {
@@ -1013,35 +952,7 @@ function pullLantern(){
 }
 $("#lnBack").addEventListener("click", () => { setStep(4); $("#lantern").classList.remove("on"); setGo("One last thing", openLantern, 400); });
 
-/* ---------- the very last screen: the closing wish ---------- */
-$("#byTitle").textContent = CONFIG.closingTitle; $("#byNote").textContent = fill(CONFIG.closingNote); $("#bySign").textContent = CONFIG.from;
-function openClosing(){
-  setStep(6);
-  $("#bye").scrollTop = 0; $("#bye").classList.add("on");
-  chord([392, 523.25, 659.25, 783.99], .05); petalRain(48); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 22), 900);
-  setGo("Next", openOnceAgain, 4200);
-}
-$("#byBack").addEventListener("click", () => { setStep(5); $("#bye").classList.remove("on"); setGo("One more wish", openClosing, 400); });
 
-/* ---------- after the closing wish: "once again" ---------- */
-$("#by2Title").textContent = CONFIG.onceTitle; $("#by2Note").textContent = fill(CONFIG.onceNote); $("#by2Foot").textContent = CONFIG.onceFoot;
-function openOnceAgain(){
-  setStep(7);
-  $("#bye2").scrollTop = 0; $("#bye2").classList.add("on");
-  chord([440, 554.37, 659.25, 880], .05); petalRain(30); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 18), 900);
-  setGo("Next", openFinal, 3600);
-}
-$("#by2Back").addEventListener("click", () => { setStep(6); $("#bye2").classList.remove("on"); setGo("Next", openOnceAgain, 400); });
-
-/* ---------- the very last screen: goodbye ---------- */
-$("#finTitle").textContent = CONFIG.finalTitle; $("#finNote").textContent = fill(CONFIG.finalMsg); $("#finEnd").textContent = CONFIG.finalEnd; $("#finSign").textContent = CONFIG.finalSign;
-function openFinal(){
-  setStep(8);
-  $("#fin").scrollTop = 0; $("#fin").classList.add("on");
-  chord([392, 493.88, 587.33, 783.99], .05); setTimeout(() => heartBurst(innerWidth / 2, innerHeight * .3, 22), 1200);
-  setGo("Relive it", () => location.reload(), 6000, "↻");
-}
-$("#finBack").addEventListener("click", () => { setStep(7); $("#fin").classList.remove("on"); setGo("Next", openFinal, 400); });
 
 /* ---------- scrapbook / album ---------- */
 const STICKERS = {

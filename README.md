@@ -9,10 +9,7 @@ A small interactive birthday site: one `index.html`, no build step.
 3. **Card** – "Happy Birthday" card with a dedicated-song player.
 4. **Album** – a two-spread scrapbook (taped photos, stickers, film strip).
 5. **Why you're special** – nine flip cards.
-6. **Lantern** – pull the chain and the lantern lights up.
-7. **Closing wish** – "Many Happy Returns": petals fall and a warm closing note appears while the song keeps playing.
-8. **Once again** – a short second birthday wish.
-9. **Goodbye** – the final message and sign-off; this is the last screen (button: *Relive it*).
+6. **Lantern** – pull the chain and the lantern lights up; this is the last screen (button: *Relive it*).
 
 A big **Next** button is fixed to the bottom of every screen, and a chain of hearts follows the cursor (or a finger).
 
@@ -36,9 +33,7 @@ Everything editable is in the `CONFIG` block near the top of the `<script>` in `
 - `pageTextL`, `pageTextR`, `bookMessage`, `loveNote`, `photoLabel`, `photoCaption` – album text
 - `reasons` – the flip cards (nine fills the 3×3 grid; `{name}` is replaced)
 - `lanternHint`, `finalNote` – the lantern screen text
-- `closingTitle`, `closingNote` – the closing wish text
-- `onceTitle`, `onceNote`, `onceFoot` – the "once again" screen
-- `finalTitle`, `finalMsg`, `finalEnd`, `finalSign` – the last goodbye screen
+- `helloScript`, `helloNote` – the lines under "Hello" on the first screen (the envelope reads "For {name}")
 - `video`, `videoPoster`, `catGif` – hero media
 
 `{name}` and `{from}` are replaced everywhere in the text fields.
