@@ -663,6 +663,8 @@ if (qs.get("from")) CONFIG.from = qs.get("from").slice(0, 30);
 document.title = `Happy Birthday ${CONFIG.name}`;
 document.querySelectorAll(".nm").forEach(e => e.textContent = CONFIG.name);
 $("#helloScript").textContent = CONFIG.helloScript; $("#helloNote").textContent = CONFIG.helloNote;
+/* warm the cache so album photos are ready the moment the album opens */
+CONFIG.photos.forEach(e => { const i = new Image(); i.decoding = "async"; i.src = e[0]; if (i.decode) i.decode().catch(() => {}); });
 $("#envTo").textContent = `For ${CONFIG.name}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
