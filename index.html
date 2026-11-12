@@ -72,6 +72,7 @@
   .stage{position:relative;width:min(78vw,330px);margin-top:clamp(2px,1.4vh,14px)}
   .dancer svg,.dancer img{display:block;width:100%;height:auto}
   .dancer.clip{position:relative;width:112px;aspect-ratio:3/4;margin-bottom:-2px;border-radius:34px;overflow:hidden;animation:none;filter:none;background:none;-webkit-mask-image:linear-gradient(to right,transparent,#000 13%,#000 87%,transparent),linear-gradient(to bottom,transparent,#000 11%,#000 89%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 13%,#000 87%,transparent),linear-gradient(to bottom,transparent,#000 11%,#000 89%,transparent);mask-composite:intersect}
+  .dancer.clip img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 25%}
   .dancer.clip video{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
   .dancer.gif{width:116px;aspect-ratio:1;margin-bottom:-2px;border-radius:20px;overflow:hidden;border:3px solid #fff;animation:none;box-shadow:0 12px 24px rgba(100,70,110,.25);transform:rotate(-2deg)}
   .dancer.gif img{height:100%;object-fit:cover}
@@ -664,6 +665,7 @@ $("#blossom").addEventListener("keydown", e => { if (e.key === "Enter" || e.key 
 const CONFIG = {
   name: "Zasham",      // birthday person
   from: "Haanu",       // your name (letter signature)
+  heroImage: "assets/hero.webp",   // still photo shown instead of the clip (set "" to use the video again)
   video: "assets/kiss.mp4",         // hero clip (loops, always with sound). Set "" to use a GIF instead
   videoPoster: "assets/kiss.jpg",
   catGif: "",                       // optional fallback GIF: direct URL / path, e.g. "assets/cat.gif"
@@ -791,6 +793,7 @@ function heroSound(){
     addEventListener("pointerdown", () => { v.muted = false; }, {once: true}); });
 }
 function mountVideo(){
+  if (CONFIG.heroImage){ const img = new Image(); img.alt = ""; img.onload = () => { const box = $("#dancer"); box.className = "dancer clip"; box.replaceChildren(img); }; img.src = CONFIG.heroImage; return; }
   if (!CONFIG.video) return mountGif();
   const v = document.createElement("video");
   v.loop = true; v.muted = true; v.autoplay = true; v.playsInline = true; v.preload = "auto";
